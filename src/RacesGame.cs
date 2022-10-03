@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
-using System.IO;
 
 namespace RD_AAOW
 	{
@@ -49,7 +48,8 @@ namespace RD_AAOW
 		public const int RoadLeft = 210;
 
 		// Основное состояние игры (начало|игра|конец)
-		private GameStatus gameStatus = GameStatus.Start;   // Начальный статус игры (статусы перечислены в Auxilitary.cs)
+		private GameStatus gameStatus = GameStatus.Start;
+		// Начальный статус игры (статусы перечислены в Auxilitary.cs)
 
 		// Описатели уровня и окна сообщений
 		private int levelNumber = 0,                        // Номер текущего уровня
@@ -161,8 +161,10 @@ namespace RD_AAOW
 			eatableAnimator.PlayAnimation (eatable);
 
 			// Черепаха при столкновении и движении
-			playerAnimation = new Animation (Content.Load<Texture2D> ("Tiles/PlayerCar"), CarState.DefWidth, 0.05f, true);
-			deadAnimation = new Animation (Content.Load<Texture2D> ("Tiles/DeadPlayerCar"), CarState.DefWidth, 0.08f, true);
+			playerAnimation = new Animation (Content.Load<Texture2D> ("Tiles/PlayerCar"),
+				CarState.DefWidth, 0.05f, true);
+			deadAnimation = new Animation (Content.Load<Texture2D> ("Tiles/DeadPlayerCar"),
+				CarState.DefWidth, 0.08f, true);
 			playerAnimator.PlayAnimation (playerAnimation);
 
 			// СОЗДАНИЕ ЗВУКОВЫХ ЭФФЕКТОВ
@@ -266,7 +268,8 @@ namespace RD_AAOW
 								{
 								for (int i = 0; i < carPosition.GetLength (0); i++)
 									// Смещение всех машин
-									carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y + currentSpeed / 2);
+									carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y +
+									currentSpeed / 2);
 
 								// Обгон
 								//if ((int)CarPosition[0, j].CurPos.Y == BackBufferHeight - 2 * CarState.DefHeight)
@@ -659,7 +662,8 @@ namespace RD_AAOW
 			{
 			// Строки для отображения
 			string S1, S2 = String.Format (" Очки: {0,10:D} ", score),
-					   S3 = String.Format (" Осталось\n обогнать: {0,5:D}", levelNumber * scoreMultiplier / 2 - carsLeft);
+					   S3 = String.Format (" Осталось\n обогнать: {0,5:D}", levelNumber *
+					   scoreMultiplier / 2 - carsLeft);
 			if (isWorking)
 				S1 = String.Format (" УРОВЕНЬ {0,2:D} ", levelNumber);
 			else
@@ -719,7 +723,7 @@ namespace RD_AAOW
 		private void ShowStartMessage ()
 			{
 			string S1 = ProgramDescription.AssemblyTitle,
-					S2 = ProgramDescription.AssemblyCopyright,
+					S2 = RDGenerics.AssemblyCopyright,
 					S6 = ProgramDescription.AssemblyLastUpdate,
 					S3 = "Нажмите Пробел для начала игры,\n",
 					S4 = "F1 для вывода справки",
@@ -1006,22 +1010,26 @@ namespace RD_AAOW
 		/// <param name="Write">Флаг режима записи настроек</param>
 		private void GameSettings (bool Write)
 			{
-			string FN = "C:\\Docume~1\\Alluse~1\\Applic~1\\Microsoft\\Windows\\RacesGame.sav";
+			/*string FN = "C:\\Docume~1\\Alluse~1\\Applic~1\\Microsoft\\Windows\\RacesGame.sav";*/
 
 			// Если требуется запись
 			if (Write)
 				{
-				Directory.CreateDirectory (FN.Substring (0, FN.Length - 13));
+				/*Directory.CreateDirectory (FN.Substring (0, FN.Length - 13));
 				StreamWriter FL = new StreamWriter (FN, false);
 
 				FL.Write ("{0:D}\n{1:D}\n{2:D}\n{3:D}", levelNumber - 1, score, isMusic, isSound);
-				FL.Close ();
+				FL.Close ();*/
+				RDGenerics.SetAppSettingsValue ("Level", (levelNumber - 1).ToString ());
+				RDGenerics.SetAppSettingsValue ("Score", score.ToString ());
+				RDGenerics.SetAppSettingsValue ("Music", isMusic.ToString ());
+				RDGenerics.SetAppSettingsValue ("Sound", isSound.ToString ());
 				}
 
 			// Если требуется чтение, и файл при этом существует
-			else if (File.Exists (FN))
+			else /*if (File.Exists (FN))*/
 				{
-				StreamReader FL = new StreamReader (FN);
+				/*StreamReader FL = new StreamReader (FN);
 
 				levelNumber = int.Parse (FL.ReadLine ());
 				currentSpeed = levelNumber + 2;
@@ -1029,7 +1037,17 @@ namespace RD_AAOW
 				isMusic = bool.Parse (FL.ReadLine ());
 				isSound = bool.Parse (FL.ReadLine ());
 
-				FL.Close ();
+				FL.Close ();*/
+
+				try
+					{
+					levelNumber = int.Parse (RDGenerics.GetAppSettingsValue ("Level"));
+					currentSpeed = levelNumber + 2;
+					score = int.Parse (RDGenerics.GetAppSettingsValue ("Score"));
+					isMusic = bool.Parse (RDGenerics.GetAppSettingsValue ("Music"));
+					isSound = bool.Parse (RDGenerics.GetAppSettingsValue ("Sound"));
+					}
+				catch { }
 				}
 			}
 

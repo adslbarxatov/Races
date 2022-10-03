@@ -1,18 +1,19 @@
-﻿# Races v 1.6.15
-> PCC: 008DC27ED2192B7B
+﻿# Races v 2.0
+> PCC: 01D7F7150FE3771D
 
 
-“Races” game – a sample project for XNA game studio
+“Races” game – a sample project for MonoGame Framework
 
-Игра «Гонки» – учебный проект для XNA game studio
+Игра «Гонки» – учебный проект для MonoGame Framework
 
 #
 
 ## Requirements / Требования
 
 - Windows 7 or newer / или новее;
-- [Microsoft .NET Framework 4.0](https://microsoft.com/en-us/download/details.aspx?id=17718);
-- [Microsoft XNA Framework Redistributable 4.0](https://microsoft.com/en-us/download/details.aspx?id=20914).
+- [Microsoft .NET Framework 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.9-windows-x86-installer);
+- MonoGame Framework (included into the package);
+- Actual update for [DirectX](https://microsoft.com/en-us/download/confirmation.aspx?id=35).
 
 Interface languages / языки интерфейса: ru_ru.
 
