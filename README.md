@@ -2,6 +2,7 @@
 > PCC: 01D7F7150FE3771D
 
 
+
 “Races” game – a sample project for MonoGame Framework
 
 Игра «Гонки» – учебный проект для MonoGame Framework
