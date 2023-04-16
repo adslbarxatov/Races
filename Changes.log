@@ -1,4 +1,10 @@
-Races game changes log
+Races minigame: changes log
+
+Version 2.1:
+• Game has been integrated into the FDL version control, localization
+  and deployment systems;
+• App now has an English (US) interface;
+• Some fixes applied to the gameplay
 
 Version 2.0:
 • App has been rebuilt under MonoGame Framework + .NET Framework 6.0;

@@ -80,7 +80,7 @@ namespace RD_AAOW
 							SStart, SStop, SOnOff,          // Старт, пауза, звук off/on
 							SAte,                           // Съедение
 							CBrake, CEng,                   // Торможение / разгон
-															//SBythe,						// Обгон
+															//SBythe,							// Обгон
 							NewLev;                         // Новый уровень
 		private int soundDelay = 0;                         // Пауза между звуками CBrake, CEng и прочими
 		private bool isSound = true, isMusic = true;        // Звук и музыка в игре on/off
@@ -145,7 +145,7 @@ namespace RD_AAOW
 				Content.Load<Texture2D> ("Tiles/CarC02"),
 				Content.Load<Texture2D> ("Tiles/CarC03"),
 				Content.Load<Texture2D> ("Tiles/CarC04")
-											};
+				};
 
 			// Разные текстуры околодорожных объектов
 			bytheTextures = new Texture2D[] {
@@ -154,7 +154,7 @@ namespace RD_AAOW
 				Content.Load<Texture2D> ("Tiles/Bythe02"),
 				Content.Load<Texture2D> ("Tiles/Bythe03"),
 				Content.Load<Texture2D> ("Tiles/Bythe04")
-											};
+				};
 
 			// Текстура съедобного объекта
 			eatable = new Animation (Content.Load<Texture2D> ("Tiles/Eatable"), 48, 0.1f, true);
@@ -272,9 +272,11 @@ namespace RD_AAOW
 									currentSpeed / 2);
 
 								// Обгон
-								//if ((int)CarPosition[0, j].CurPos.Y == BackBufferHeight - 2 * CarState.DefHeight)
-								//	if(IsSound)
-								//SBythe.Play ();
+								/*if ((int)carPosition[0, j].CurrentPosition.Y == BackBufferHeight - 
+									2 * CarState.DefHeight)
+									if (isSound)
+										SBythe.Play ((60 + rnd.Next (20)) * 0.01f,
+											(30 - rnd.Next (60)) * 0.01f, (50 - rnd.Next (100)) * 0.01f);*/
 
 								// Выход за границы уровня
 								if (carPosition[0, j].CurrentPosition.Y > BackBufferHeight + CarState.DefHeight)
@@ -292,8 +294,10 @@ namespace RD_AAOW
 
 									if (levelNumber <= 12)
 										{
-										// Если (внезапно) все восемь машин окажутся активными
-										if (s == carPosition.GetLength (0))
+										// Если (внезапно) восемь или семь машин окажутся активными
+										if (s > carPosition.GetLength (0) - 1)
+											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
+										if (s > carPosition.GetLength (0) - 2)
 											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
 										}
 									else if (levelNumber <= 17)
@@ -465,6 +469,14 @@ namespace RD_AAOW
 						return true;
 						}
 
+					// Справка
+					if (keyboardState.IsKeyDown (Keys.L))
+						{
+						gameStatus = GameStatus.Language;
+
+						return true;
+						}
+
 					// Переход далее
 					if (keyboardState.IsKeyDown (Keys.Space))
 						{
@@ -481,6 +493,7 @@ namespace RD_AAOW
 
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Help:
+				case GameStatus.Language:
 					// Возврат
 					if (keyboardState.IsKeyDown (Keys.Escape))
 						{
@@ -661,18 +674,26 @@ namespace RD_AAOW
 		private void DrawInfo ()
 			{
 			// Строки для отображения
-			string S1, S2 = String.Format (" Очки: {0,10:D} ", score),
-					   S3 = String.Format (" Осталось\n обогнать: {0,5:D}", levelNumber *
-					   scoreMultiplier / 2 - carsLeft);
+			if (string.IsNullOrWhiteSpace (stPoints))
+				{
+				stPoints = Localization.GetText ("Points");
+				stCarsLeft = Localization.GetText ("CarsLeft");
+				stLevel = Localization.GetText ("Level");
+				stPause = Localization.GetText ("Pause");
+				}
+
+			string S1,
+				S2 = string.Format (stPoints, score),
+				S3 = string.Format (stCarsLeft, levelNumber * scoreMultiplier / 2 - carsLeft);
 			if (isWorking)
-				S1 = String.Format (" УРОВЕНЬ {0,2:D} ", levelNumber);
+				S1 = string.Format (stLevel, levelNumber);
 			else
-				S1 = " ПАУЗА ";
+				S1 = stPause;
 
 			// Векторы позиций для отображения элементов
-			Vector2 V1 = new Vector2 (0, 16),
-					V2 = new Vector2 (0, 48),
-					V3 = new Vector2 (0, 80),
+			Vector2 V1 = new Vector2 (12, 16),
+					V2 = new Vector2 (12, 48),
+					V3 = new Vector2 (12, 80),
 					V4 = new Vector2 (16, BackBufferHeight - 32),
 					V5 = new Vector2 (48, BackBufferHeight - 32);
 
@@ -692,114 +713,177 @@ namespace RD_AAOW
 			else
 				DrawShadowedString (defFont, "[\x266A]", V5, RacesGameColors.Black);
 			}
+		private string stLevel, stPause, stCarsLeft, stPoints;
 
 		/// <summary>
 		/// Отображение сообщения о проигрыше
 		/// </summary>
 		private void ShowLoseMessage ()
 			{
-			string S1 = "МАШИНА",
+			// Сборка строк
+			if (string.IsNullOrWhiteSpace (stLoseLines[0]))
+				{
+				string[] values = Localization.GetText ("LoseLines").Split (splitter,
+					StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < stLoseLines.Length; i++)
+					stLoseLines[i] = values[i];
+				}
+
+			/*string S1 = "МАШИНА",
 					S2 = "РАЗБИТА!",
 					S3 = "Нажмите Пробел,",
-					S4 = "чтобы попробовать снова";
+					S4 = "чтобы попробовать снова";*/
 
-			Vector2 V1 = new Vector2 (16, (BackBufferHeight - 250) / 2),
-					V2 = new Vector2 (16, (BackBufferHeight - 180) / 2),
-					V3 = new Vector2 (16, (BackBufferHeight - 60) / 2),
-					V4 = new Vector2 (16, (BackBufferHeight - 10) / 2);
+			Vector2 V1 = new Vector2 (12, (BackBufferHeight - 250) / 2),
+					V2 = new Vector2 (12, (BackBufferHeight - 180) / 2),
+					V3 = new Vector2 (12, (BackBufferHeight - 60) / 2),
+					V4 = new Vector2 (12, (BackBufferHeight - 10) / 2);
 
-			DrawShadowedString (midFont, S1, V1, RacesGameColors.Red);
-			DrawShadowedString (midFont, S2, V2, RacesGameColors.Red);
+			DrawShadowedString (midFont, stLoseLines[0], V1, RacesGameColors.Red);
+			DrawShadowedString (midFont, stLoseLines[1], V2, RacesGameColors.Red);
 			if (!showExitMsg)
 				{
-				DrawShadowedString (defFont, S3, V3, RacesGameColors.Red);
-				DrawShadowedString (defFont, S4, V4, RacesGameColors.Red);
+				DrawShadowedString (defFont, stLoseLines[2], V3, RacesGameColors.Red);
+				DrawShadowedString (defFont, stLoseLines[3], V4, RacesGameColors.Red);
 				}
 			}
+		private string[] stLoseLines = new string[4];
+		private char[] splitter = new char[] { '\t' };
 
 		/// <summary>
 		/// Отображение сообщения о начале игры
 		/// </summary>
 		private void ShowStartMessage ()
 			{
-			string S1 = ProgramDescription.AssemblyTitle,
-					S2 = RDGenerics.AssemblyCopyright,
-					S6 = ProgramDescription.AssemblyLastUpdate,
-					S3 = "Нажмите Пробел для начала игры,\n",
-					S4 = "F1 для вывода справки",
-					S5 = "или Esc для выхода";
+			// Сборка строк
+			if (string.IsNullOrWhiteSpace (stStartLines[0]))
+				{
+				string[] values = Localization.GetText ("StartLines").Split (splitter,
+					StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < stStartLines.Length - 1; i++)
+					stStartLines[i] = values[i];
+				stStartLines[3] = ProgramDescription.AssemblyTitle;
+				}
 
-			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (S1).X) / 2,
+			/*string S1 = ProgramDescription.AssemblyTitle;
+			,S2 = RDGenerics.AssemblyCopyright,
+			S6 = ProgramDescription.AssemblyLastUpdate,
+			S3 = "Нажмите Пробел для начала игры,\n",
+			S4 = "F1 для вывода справки",
+			S5 = "или Esc для выхода"*/
+
+			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (stStartLines[3]).X) / 2,
 						120),
-					V2 = new Vector2 (BackBufferWidth - defFont.MeasureString (S6).X - 20,
+					/*V2 = new Vector2 (BackBufferWidth - defFont.MeasureString (S6).X - 20,
 						BackBufferHeight - 70),
 					V6 = new Vector2 (BackBufferWidth - defFont.MeasureString (S6).X - 20,
-						BackBufferHeight - 40),
-					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S3).X) / 2,
+						BackBufferHeight - 40),*/
+					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stStartLines[0]).X) / 2,
 						BackBufferHeight / 2),
-					V4 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S4).X) / 2,
+					V4 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stStartLines[1]).X) / 2,
 						BackBufferHeight / 2 + 30),
-					V5 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S5).X) / 2,
+					V5 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stStartLines[2]).X) / 2,
 						BackBufferHeight / 2 + 60);
 
 			spriteBatch.Draw (startBack, Vector2.Zero, RacesGameColors.White);
-			DrawShadowedString (bigFont, S1, V1, RacesGameColors.Green);
-			DrawShadowedString (defFont, S2, V2, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S6, V6, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S3, V3, RacesGameColors.LBlue);
-			DrawShadowedString (defFont, S4, V4, RacesGameColors.LBlue);
-			DrawShadowedString (defFont, S5, V5, RacesGameColors.LBlue);
+			DrawShadowedString (bigFont, stStartLines[3], V1, RacesGameColors.Green);
+			/*DrawShadowedString (defFont, S2, V2, RacesGameColors.Yellow);
+			DrawShadowedString (defFont, S6, V6, RacesGameColors.Yellow);*/
+			DrawShadowedString (defFont, stStartLines[0], V3, RacesGameColors.LBlue);
+			DrawShadowedString (defFont, stStartLines[1], V4, RacesGameColors.LBlue);
+			DrawShadowedString (defFont, stStartLines[2], V5, RacesGameColors.LBlue);
 			}
+		private string[] stStartLines = new string[4];
 
 		/// <summary>
 		/// Отображение сообщения о конце игры
 		/// </summary>
 		private void ShowFinishMessage ()
 			{
-			string S1 = "ПОБЕДА!!!",
-					S2 = string.Format ("Ваш выигрыш: {0,10:D} очков", score),
-					S3 = "Нажмите Пробел для продолжения";
+			// Сборка строк
+			if (string.IsNullOrWhiteSpace (stSuccessLines[0]))
+				{
+				string[] values = Localization.GetText ("SuccessLines").Split (splitter,
+					StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < stSuccessLines.Length; i++)
+					stSuccessLines[i] = values[i];
+				}
 
-			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (S1).X) / 2,
+			string S01 = string.Format (stSuccessLines[1], score);
+			/*S1 = "ПОБЕДА!!!",
+			"Ваш выигрыш: {0,10:D} очков"
+			, S3 = "Нажмите Пробел для продолжения"*/
+
+			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (stSuccessLines[0]).X) / 2,
 						(BackBufferHeight - 400) / 2),
-					V2 = new Vector2 ((BackBufferWidth - midFont.MeasureString (S2).X) / 2,
+					V2 = new Vector2 ((BackBufferWidth - midFont.MeasureString (S01).X) / 2,
 						(BackBufferHeight - 50) / 2),
-					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S3).X) / 2,
+					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stSuccessLines[2]).X) / 2,
 						(BackBufferHeight + 100) / 2);
 
 			spriteBatch.Draw (startBack, Vector2.Zero, RacesGameColors.White);
-			DrawShadowedString (bigFont, S1, V1, RacesGameColors.Green);
-			DrawShadowedString (midFont, S2, V2, RacesGameColors.LBlue);
-			DrawShadowedString (defFont, S3, V3, RacesGameColors.Orange);
+			DrawShadowedString (bigFont, stSuccessLines[0], V1, RacesGameColors.Green);
+			DrawShadowedString (midFont, S01, V2, RacesGameColors.LBlue);
+			DrawShadowedString (defFont, stSuccessLines[2], V3, RacesGameColors.Orange);
 			}
+		private string[] stSuccessLines = new string[3];
 
 		/// <summary>
 		/// Отображение запроса на подтверждение выхода
 		/// </summary>
 		private void ShowExitMessage ()
 			{
-			string S1 = "Вы действительно хотите",
+			// Сборка строк
+			if (string.IsNullOrWhiteSpace (stExitLines[0]))
+				{
+				string[] values = Localization.GetText ("ExitLines").Split (splitter,
+					StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < stExitLines.Length; i++)
+					stExitLines[i] = values[i];
+				}
+
+			/*string S1 = "Вы действительно хотите",
 					S2 = "завершить игру?",
 					S3 = "Нажмите Y, чтобы выйти из игры,",
-					S4 = "или N, чтобы вернуться";
+					S4 = "или N, чтобы вернуться";*/
 
-			Vector2 V1 = new Vector2 (16, (BackBufferHeight) / 2),
-					V2 = new Vector2 (16, (BackBufferHeight + 70) / 2),
-					V3 = new Vector2 (16, (BackBufferHeight + 190) / 2),
-					V4 = new Vector2 (16, (BackBufferHeight + 240) / 2);
+			Vector2 V1 = new Vector2 (12, (BackBufferHeight) / 2),
+					V2 = new Vector2 (12, (BackBufferHeight + 70) / 2),
+					V3 = new Vector2 (12, (BackBufferHeight + 190) / 2),
+					V4 = new Vector2 (12, (BackBufferHeight + 240) / 2);
 
-			DrawShadowedString (midFont, S1, V1, RacesGameColors.Orange);
-			DrawShadowedString (midFont, S2, V2, RacesGameColors.Orange);
-			DrawShadowedString (defFont, S3, V3, RacesGameColors.Orange);
-			DrawShadowedString (defFont, S4, V4, RacesGameColors.Orange);
+			DrawShadowedString (midFont, stExitLines[0], V1, RacesGameColors.Orange);
+			DrawShadowedString (midFont, stExitLines[1], V2, RacesGameColors.Orange);
+			DrawShadowedString (defFont, stExitLines[2], V3, RacesGameColors.Orange);
+			DrawShadowedString (defFont, stExitLines[3], V4, RacesGameColors.Orange);
 			}
+		private string[] stExitLines = new string[4];
 
 		/// <summary>
-		/// Отображение справки
+		/// Отображение вспомогательных интерфейсов
 		/// </summary>
-		private void ShowHelpMessage ()
+		private void ShowServiceMessage (bool Language)
 			{
-			string S1 = "Правила игры",
+			// Защита от множественного входа
+			if (showingServiceMessage)
+				return;
+			showingServiceMessage = true;
+
+			// Блокировка отрисовки и запуск справки
+			spriteBatch.End ();
+
+			if (Language)
+				RDGenerics.MessageBox ();
+			else
+				RDGenerics.ShowAbout (false);
+
+			spriteBatch.Begin ();
+
+			// Выход в меню
+			gameStatus = GameStatus.Start;
+			showingServiceMessage = false;
+
+			/*string S1 = "Правила игры",
 					S2 = "   В игре необходимо проехать всю трассу (12 уровней),\n" +
 						 "не сталкиваясь с другими автомобилями. За их обгон,\n" +
 						 "а также за пойманные на дороге бриллианты будут\n" +
@@ -830,13 +914,13 @@ namespace RD_AAOW
 			DrawShadowedString (defFont, S2, V2, RacesGameColors.Orange);
 			DrawShadowedString (defFont, S3, V3, RacesGameColors.Orange);
 			DrawShadowedString (midFont, S4, V4, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S5, V5, RacesGameColors.Orange);
+			DrawShadowedString (defFont, S5, V5, RacesGameColors.Orange);*/
 			}
+		private bool showingServiceMessage = false;
 
 		/// <summary>
 		/// Отрисовка уровня игры
 		/// </summary>
-		/// <param name="VGameTime"></param>
 		protected override void Draw (GameTime VGameTime)
 			{
 			// Создание чистого окна и запуск рисования
@@ -854,7 +938,11 @@ namespace RD_AAOW
 
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Help:
-					ShowHelpMessage ();
+					ShowServiceMessage (false);
+					break;
+
+				case GameStatus.Language:
+					ShowServiceMessage (true);
 					break;
 
 				//////////////////////////////////////////////////////////////////
@@ -871,8 +959,10 @@ namespace RD_AAOW
 					if (bytheShow == 1)
 						spriteBatch.Draw (bytheTextures[bytheTextureNumber],
 							new Rectangle ((int)bythePosition.X, (int)bythePosition.Y,
-								bytheTextures[bytheTextureNumber].Width, bytheTextures[bytheTextureNumber].Height),
-							new Rectangle (0, 0, bytheTextures[bytheTextureNumber].Width, bytheTextures[bytheTextureNumber].Height),
+								bytheTextures[bytheTextureNumber].Width,
+								bytheTextures[bytheTextureNumber].Height),
+							new Rectangle (0, 0, bytheTextures[bytheTextureNumber].Width,
+								bytheTextures[bytheTextureNumber].Height),
 								RacesGameColors.White,
 								0.0f, new Vector2 (bytheTextures[bytheTextureNumber].Width / 2,
 								bytheTextures[bytheTextureNumber].Height / 2), SpriteEffects.None, 0.0f);
@@ -882,11 +972,13 @@ namespace RD_AAOW
 						for (int j = 0; j < carPosition.GetLength (1); j++)
 							if (carPosition[i, j].Enabled == 1)
 								spriteBatch.Draw (carTextures[carPosition[i, j].TextureNumber],
-									carPosition[i, j].DestinationRect, carPosition[i, j].SourceRect, RacesGameColors.White,
+									carPosition[i, j].DestinationRect,
+									carPosition[i, j].SourceRect, RacesGameColors.White,
 									0.0f, carPosition[i, j].Origin, SpriteEffects.None, 0.0f);
 
 					// Игрок (над ними)
-					playerAnimator.Draw (VGameTime, spriteBatch, playerPosition, SpriteEffects.None, RacesGameColors.White, 0.0f);
+					playerAnimator.Draw (VGameTime, spriteBatch, playerPosition, SpriteEffects.None,
+						RacesGameColors.White, 0.0f);
 
 					// ОТОБРАЖЕНИЕ ИНФОРМАЦИИ УРОВНЯ
 					DrawInfo ();
@@ -1010,16 +1102,9 @@ namespace RD_AAOW
 		/// <param name="Write">Флаг режима записи настроек</param>
 		private void GameSettings (bool Write)
 			{
-			/*string FN = "C:\\Docume~1\\Alluse~1\\Applic~1\\Microsoft\\Windows\\RacesGame.sav";*/
-
 			// Если требуется запись
 			if (Write)
 				{
-				/*Directory.CreateDirectory (FN.Substring (0, FN.Length - 13));
-				StreamWriter FL = new StreamWriter (FN, false);
-
-				FL.Write ("{0:D}\n{1:D}\n{2:D}\n{3:D}", levelNumber - 1, score, isMusic, isSound);
-				FL.Close ();*/
 				RDGenerics.SetAppSettingsValue ("Level", (levelNumber - 1).ToString ());
 				RDGenerics.SetAppSettingsValue ("Score", score.ToString ());
 				RDGenerics.SetAppSettingsValue ("Music", isMusic.ToString ());
@@ -1027,18 +1112,8 @@ namespace RD_AAOW
 				}
 
 			// Если требуется чтение, и файл при этом существует
-			else /*if (File.Exists (FN))*/
+			else
 				{
-				/*StreamReader FL = new StreamReader (FN);
-
-				levelNumber = int.Parse (FL.ReadLine ());
-				currentSpeed = levelNumber + 2;
-				score = int.Parse (FL.ReadLine ());
-				isMusic = bool.Parse (FL.ReadLine ());
-				isSound = bool.Parse (FL.ReadLine ());
-
-				FL.Close ();*/
-
 				try
 					{
 					levelNumber = int.Parse (RDGenerics.GetAppSettingsValue ("Level"));

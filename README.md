@@ -1,9 +1,9 @@
-﻿# Races v 2.0 
-> PCC: 01D7F7150FE3771D
+﻿# Races v 2.1
+> PCC: 01DA6D7D675D6524
 
 
 
-“Races” game – a sample project for MonoGame Framework
+“Races” minigame – a sample project for MonoGame Framework
 
 Игра «Гонки» – учебный проект для MonoGame Framework
 
@@ -16,7 +16,7 @@
 - [MonoGame Framework](https://monogame.net) (included in the package / включено в пакет);
 - Actual update for [DirectX](https://microsoft.com/en-us/download/confirmation.aspx?id=35).
 
-Interface languages / языки интерфейса: ru_ru.
+Interface languages / языки интерфейса: en_us, ru_ru.
 
 &nbsp;
 
