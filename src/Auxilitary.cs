@@ -283,7 +283,7 @@ namespace RD_AAOW
 		{
 		private const float m = 0.7f;
 
-		public static Color Red = new Color (255, 0, 0),
+		public static Color Red = new Color (255, 32, 0),
 							Yellow = new Color (255, 255, 0),
 							Orange = new Color (255, 128, 0),
 							Brown = new Color (160, 40, 40),

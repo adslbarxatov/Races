@@ -88,9 +88,7 @@ namespace RD_AAOW
 			for (int i = 0; i < Pths.Length; i++)
 				if (!File.Exists (".\\Content\\Races\\" + Pths[i]))
 					{
-					MessageBox.Show ("Отсутствует файл игры \xAB" + Pths[i] +
-						"\xBB\nВыполните повторную компиляцию программы или обратитесь к разработчику",
-						ProgramDescription.AssemblyTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+					RDGenerics.LocalizedMessageBox (RDMessageTypes.Error, "MissingFile");
 					return;
 					}
 

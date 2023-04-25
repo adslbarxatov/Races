@@ -400,7 +400,8 @@ namespace RD_AAOW
 							score += 5 * scoreMultiplier;
 
 							// Звук
-							SAte.Play ();
+							if (isSound)
+								SAte.Play ();
 							}
 						}
 
@@ -469,7 +470,7 @@ namespace RD_AAOW
 						return true;
 						}
 
-					// Справка
+					// Выбор языка интерфеса
 					if (keyboardState.IsKeyDown (Keys.L))
 						{
 						gameStatus = GameStatus.Language;
@@ -639,7 +640,8 @@ namespace RD_AAOW
 						soundDelay++;
 						soundDelay %= 100;
 						if (soundDelay == 0)
-							CBrake.Play ();
+							CBrake.Play ((90 + rnd.Next (10)) * 0.01f,
+								(10 - rnd.Next (20)) * 0.01f, 0.0f);
 						}
 					}
 
@@ -729,11 +731,6 @@ namespace RD_AAOW
 					stLoseLines[i] = values[i];
 				}
 
-			/*string S1 = "МАШИНА",
-					S2 = "РАЗБИТА!",
-					S3 = "Нажмите Пробел,",
-					S4 = "чтобы попробовать снова";*/
-
 			Vector2 V1 = new Vector2 (12, (BackBufferHeight - 250) / 2),
 					V2 = new Vector2 (12, (BackBufferHeight - 180) / 2),
 					V3 = new Vector2 (12, (BackBufferHeight - 60) / 2),
@@ -765,19 +762,8 @@ namespace RD_AAOW
 				stStartLines[3] = ProgramDescription.AssemblyTitle;
 				}
 
-			/*string S1 = ProgramDescription.AssemblyTitle;
-			,S2 = RDGenerics.AssemblyCopyright,
-			S6 = ProgramDescription.AssemblyLastUpdate,
-			S3 = "Нажмите Пробел для начала игры,\n",
-			S4 = "F1 для вывода справки",
-			S5 = "или Esc для выхода"*/
-
 			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (stStartLines[3]).X) / 2,
 						120),
-					/*V2 = new Vector2 (BackBufferWidth - defFont.MeasureString (S6).X - 20,
-						BackBufferHeight - 70),
-					V6 = new Vector2 (BackBufferWidth - defFont.MeasureString (S6).X - 20,
-						BackBufferHeight - 40),*/
 					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stStartLines[0]).X) / 2,
 						BackBufferHeight / 2),
 					V4 = new Vector2 ((BackBufferWidth - defFont.MeasureString (stStartLines[1]).X) / 2,
@@ -787,8 +773,6 @@ namespace RD_AAOW
 
 			spriteBatch.Draw (startBack, Vector2.Zero, RacesGameColors.White);
 			DrawShadowedString (bigFont, stStartLines[3], V1, RacesGameColors.Green);
-			/*DrawShadowedString (defFont, S2, V2, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S6, V6, RacesGameColors.Yellow);*/
 			DrawShadowedString (defFont, stStartLines[0], V3, RacesGameColors.LBlue);
 			DrawShadowedString (defFont, stStartLines[1], V4, RacesGameColors.LBlue);
 			DrawShadowedString (defFont, stStartLines[2], V5, RacesGameColors.LBlue);
@@ -808,11 +792,7 @@ namespace RD_AAOW
 				for (int i = 0; i < stSuccessLines.Length; i++)
 					stSuccessLines[i] = values[i];
 				}
-
 			string S01 = string.Format (stSuccessLines[1], score);
-			/*S1 = "ПОБЕДА!!!",
-			"Ваш выигрыш: {0,10:D} очков"
-			, S3 = "Нажмите Пробел для продолжения"*/
 
 			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (stSuccessLines[0]).X) / 2,
 						(BackBufferHeight - 400) / 2),
@@ -841,11 +821,6 @@ namespace RD_AAOW
 				for (int i = 0; i < stExitLines.Length; i++)
 					stExitLines[i] = values[i];
 				}
-
-			/*string S1 = "Вы действительно хотите",
-					S2 = "завершить игру?",
-					S3 = "Нажмите Y, чтобы выйти из игры,",
-					S4 = "или N, чтобы вернуться";*/
 
 			Vector2 V1 = new Vector2 (12, (BackBufferHeight) / 2),
 					V2 = new Vector2 (12, (BackBufferHeight + 70) / 2),
@@ -882,39 +857,6 @@ namespace RD_AAOW
 			// Выход в меню
 			gameStatus = GameStatus.Start;
 			showingServiceMessage = false;
-
-			/*string S1 = "Правила игры",
-					S2 = "   В игре необходимо проехать всю трассу (12 уровней),\n" +
-						 "не сталкиваясь с другими автомобилями. За их обгон,\n" +
-						 "а также за пойманные на дороге бриллианты будут\n" +
-						 "начисляться очки; за столкновения они будут сниматься.\n" +
-						 "Каждый новый уровень предполагает большую скорость и\n" +
-						 "большее число машин, которые нужно обогнать",
-					S3 = "Удачи!!!",
-					S4 = "Управление",
-					S5 = "Пробел  - пауза / возобновление / начало игры\n" +
-						 "Стрелки - управление машиной\n" +
-						 "Esc     - выход из игры / из справки\n" +
-						 "S       - включение / выключение звука\n" +
-						 "M      - включение / выключение музыки";
-
-			Vector2 V1 = new Vector2 ((BackBufferWidth - midFont.MeasureString (S1).X) / 2,
-						BackBufferHeight / 2 - 290),
-					V2 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S2).X) / 2,
-						BackBufferHeight / 2 - 240),
-					V3 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S3).X) / 2,
-						BackBufferHeight / 2 - 120),
-					V4 = new Vector2 ((BackBufferWidth - midFont.MeasureString (S4).X) / 2,
-						BackBufferHeight / 2 - 60),
-					V5 = new Vector2 ((BackBufferWidth - defFont.MeasureString (S5).X) / 2,
-						BackBufferHeight / 2 - 10);
-
-			spriteBatch.Draw (startBack, Vector2.Zero, RacesGameColors.White);
-			DrawShadowedString (midFont, S1, V1, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S2, V2, RacesGameColors.Orange);
-			DrawShadowedString (defFont, S3, V3, RacesGameColors.Orange);
-			DrawShadowedString (midFont, S4, V4, RacesGameColors.Yellow);
-			DrawShadowedString (defFont, S5, V5, RacesGameColors.Orange);*/
 			}
 		private bool showingServiceMessage = false;
 
