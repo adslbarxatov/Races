@@ -3,7 +3,7 @@
 
 
 
-“Races” minigame – a sample project for MonoGame Framework
+Races minigame – a sample project for MonoGame Framework
 
 Игра «Гонки» – учебный проект для MonoGame Framework
 
