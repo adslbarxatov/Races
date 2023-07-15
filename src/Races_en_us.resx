@@ -146,8 +146,9 @@ Controls:
     <value>CAR IS	CRASHED!	Press [Space]	to try again</value>
   </data>
   <data name="MissingFile" xml:space="preserve">
-    <value>Missing game file “{0:S}”.
-Reinstall the program or contact the developer</value>
+    <value>Missing file “{0:S}”.
+
+Reinstall the game or contact the developer</value>
   </data>
   <data name="Pause" xml:space="preserve">
     <value>PAUSE</value>

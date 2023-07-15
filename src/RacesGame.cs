@@ -272,11 +272,13 @@ namespace RD_AAOW
 									currentSpeed / 2);
 
 								// Обгон
-								/*if ((int)carPosition[0, j].CurrentPosition.Y == BackBufferHeight - 
+#if false
+								if ((int)carPosition[0, j].CurrentPosition.Y == BackBufferHeight - 
 									2 * CarState.DefHeight)
 									if (isSound)
 										SBythe.Play ((60 + rnd.Next (20)) * 0.01f,
-											(30 - rnd.Next (60)) * 0.01f, (50 - rnd.Next (100)) * 0.01f);*/
+											(30 - rnd.Next (60)) * 0.01f, (50 - rnd.Next (100)) * 0.01f);
+#endif
 
 								// Выход за границы уровня
 								if (carPosition[0, j].CurrentPosition.Y > BackBufferHeight + CarState.DefHeight)
