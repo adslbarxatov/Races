@@ -1,13 +1,22 @@
-# Races v 2.2.11
-> PCC: 01DAAE8DA870F97B
+# Races
+
+## Description
+
+Races minigame – a sample project for MonoGame Framework.
+A detailed description of the app is available on [its own page](https://adslbarxatov.github.io/Races)
+
+&nbsp;
 
 
 
-Races minigame – a sample project for MonoGame Framework
+## Описание
 
-Игра «Гонки» – учебный проект для MonoGame Framework
+Игра «Гонки» – учебный проект для MonoGame Framework.
+Подробное описание приложения доступно на [отдельной странице](https://adslbarxatov.github.io/Races/ru)
 
-#
+&nbsp;
+
+
 
 ## Requirements / Требования
 
