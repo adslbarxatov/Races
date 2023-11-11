@@ -2,7 +2,7 @@
 
 ## Description
 
-Races minigame – a sample project for MonoGame Framework.
+“Races” minigame – a sample project for MonoGame Framework.
 A detailed description of the app is available on [its own page](https://adslbarxatov.github.io/Races)
 
 &nbsp;

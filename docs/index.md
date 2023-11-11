@@ -26,4 +26,4 @@ Good luck!
 - `S` – mute / unmute SFX
 - `M` – turn on / off the music
 - `L` – change the interface language
-- `F1` – show the help references
+- `F1` – show the help materials
