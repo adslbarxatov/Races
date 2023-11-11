@@ -17,12 +17,13 @@ be reduced for collisions. Each new level involves more speed and more cars to o
 Good luck!
 
 ***Controls***:
-`Space` – pause / resume / start game
-`↑` – accelerator
-`↓` – brake
-`←`, `→` – movement
-`Esc` – exit the game
-`S` – mute / unmute SFX
-`M` – turn on / off the music
-`L` – change the interface language
-`F1` – show the help references
+
+- `Space` – pause / resume / start game
+- `↑` – accelerator
+- `↓` – brake
+- `←`, `→` – movement
+- `Esc` – exit the game
+- `S` – mute / unmute SFX
+- `M` – turn on / off the music
+- `L` – change the interface language
+- `F1` – show the help references

@@ -124,21 +124,6 @@ left: {0,5:D}</value>
   <data name="ExitLines" xml:space="preserve">
     <value>Do you want	to exit the game?	Press [Y] to exit,	or [N] to continue</value>
   </data>
-  <data name="HelpText" xml:space="preserve">
-    <value>Rules:
-In the game you need to drive the entire track (12 levels), without colliding with other cars. For overtaking them, and also for diamonds caught on the road points will be awarded; they will be reduced for collisions. Each new level involves more speed and more cars to overtake.
-Good luck!
-
-Controls:
-[Space] – pause / resume / start game
-[↑] – accelerator
-[↓] – brake
-[←], [→] – movement
-[Esc] – exit the game
-[S] – mute / unmute SFX
-[M] – turn on / off the music
-[L] – change the interface language</value>
-  </data>
   <data name="Level" xml:space="preserve">
     <value>LEVEL {0,2:D}</value>
   </data>
