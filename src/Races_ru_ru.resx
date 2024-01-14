@@ -130,11 +130,6 @@
   <data name="LoseLines" xml:space="preserve">
     <value>МАШИНА	РАЗБИТА!	Нажмите [Пробел],	чтобы попробовать снова</value>
   </data>
-  <data name="MissingFile" xml:space="preserve">
-    <value>Отсутствует файл «{0:S}».
-
-Выполните повторную установку игры или обратитесь к разработчику</value>
-  </data>
   <data name="Pause" xml:space="preserve">
     <value>ПАУЗА</value>
   </data>

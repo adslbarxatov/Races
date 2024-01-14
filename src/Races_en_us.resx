@@ -130,11 +130,6 @@ left: {0,5:D}</value>
   <data name="LoseLines" xml:space="preserve">
     <value>CAR IS	CRASHED!	Press [Space]	to try again</value>
   </data>
-  <data name="MissingFile" xml:space="preserve">
-    <value>Missing file “{0:S}”.
-
-Reinstall the game or contact the developer</value>
-  </data>
   <data name="Pause" xml:space="preserve">
     <value>PAUSE</value>
   </data>

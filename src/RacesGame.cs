@@ -8,126 +8,126 @@ using System;
 namespace RD_AAOW
 	{
 	/// <summary>
-	/// Класс описывает игру Гонки
+	/// РљР»Р°СЃСЃ РѕРїРёСЃС‹РІР°РµС‚ РёРіСЂСѓ Р“РѕРЅРєРё
 	/// </summary>
 	public class RacesGame: Game
 		{
 		/////////////////////////////////////////////////////////////////////////////////
-		// ПЕРЕМЕННЫЕ
+		// РџР•Р Р•РњР•РќРќР«Р•
 
-		// Драйвера игры
-		private GraphicsDeviceManager graphics;             // Графика
-		private SpriteBatch spriteBatch;                    // Sprite-отрисовка
-		private KeyboardState keyboardState;                // Состояние клавиатуры
-		private SpriteFont defFont, midFont, bigFont;       // Шрифты
-		private Random rnd = new Random ();                 // ГСЧ
+		// Р”СЂР°Р№РІРµСЂР° РёРіСЂС‹
+		private GraphicsDeviceManager graphics;             // Р“СЂР°С„РёРєР°
+		private SpriteBatch spriteBatch;                    // Sprite-РѕС‚СЂРёСЃРѕРІРєР°
+		private KeyboardState keyboardState;                // РЎРѕСЃС‚РѕСЏРЅРёРµ РєР»Р°РІРёР°С‚СѓСЂС‹
+		private SpriteFont defFont, midFont, bigFont;       // РЁСЂРёС„С‚С‹
+		private Random rnd = new Random ();                 // Р“РЎР§
 
 		/// <summary>
-		/// Ширина окна
+		/// РЁРёСЂРёРЅР° РѕРєРЅР°
 		/// </summary>
 		public const int BackBufferWidth = 620;
 
 		/// <summary>
-		/// Высота окна
+		/// Р’С‹СЃРѕС‚Р° РѕРєРЅР°
 		/// </summary>
 		public const int BackBufferHeight = 640;
 
 		/// <summary>
-		/// Ширина дорожной полосы
+		/// РЁРёСЂРёРЅР° РґРѕСЂРѕР¶РЅРѕР№ РїРѕР»РѕСЃС‹
 		/// </summary>
 		public const int RoadLineWidth = 50;
 
 		/// <summary>
-		/// Количество дорожных полос
+		/// РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЂРѕР¶РЅС‹С… РїРѕР»РѕСЃ
 		/// </summary>
 		public const int LinesQuantity = 8;
 
 		/// <summary>
-		/// Граница дороги
+		/// Р“СЂР°РЅРёС†Р° РґРѕСЂРѕРіРё
 		/// </summary>
 		public const int RoadLeft = 210;
 
-		// Основное состояние игры (начало|игра|конец)
+		// РћСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РёРіСЂС‹ (РЅР°С‡Р°Р»Рѕ|РёРіСЂР°|РєРѕРЅРµС†)
 		private GameStatus gameStatus = GameStatus.Start;
-		// Начальный статус игры (статусы перечислены в Auxilitary.cs)
+		// РќР°С‡Р°Р»СЊРЅС‹Р№ СЃС‚Р°С‚СѓСЃ РёРіСЂС‹ (СЃС‚Р°С‚СѓСЃС‹ РїРµСЂРµС‡РёСЃР»РµРЅС‹ РІ Auxilitary.cs)
 
-		// Описатели уровня и окна сообщений
-		private int levelNumber = 0,                        // Номер текущего уровня
-					carsLeft = 0,                           // Количество пройденных машин
-					currentSpeed = 3;                       // Скорость игрока
-		private const int levelsQuantity = 30;              // Число уровней
-		private Texture2D back,                             // Фон игры
-						  startBack;                        // Фон на старте
-		private Vector2 backOffset;                         // Смещение текстуры дороги
+		// РћРїРёСЃР°С‚РµР»Рё СѓСЂРѕРІРЅСЏ Рё РѕРєРЅР° СЃРѕРѕР±С‰РµРЅРёР№
+		private int levelNumber = 0,                        // РќРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРІРЅСЏ
+					carsLeft = 0,                           // РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕР№РґРµРЅРЅС‹С… РјР°С€РёРЅ
+					currentSpeed = 3;                       // РЎРєРѕСЂРѕСЃС‚СЊ РёРіСЂРѕРєР°
+		private const int levelsQuantity = 30;              // Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
+		private Texture2D back,                             // Р¤РѕРЅ РёРіСЂС‹
+						  startBack;                        // Р¤РѕРЅ РЅР° СЃС‚Р°СЂС‚Рµ
+		private Vector2 backOffset;                         // РЎРјРµС‰РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ РґРѕСЂРѕРіРё
 
-		// Текущая позиция игрока и его объекты анимации
-		private Vector2 playerPosition;                     // Текущая позиция
-		private Animation playerAnimation, deadAnimation;   // Изображения анимации (движется, dead)
-		private AnimationPlayer playerAnimator;             // Объект-анимация
+		// РўРµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РёРіСЂРѕРєР° Рё РµРіРѕ РѕР±СЉРµРєС‚С‹ Р°РЅРёРјР°С†РёРё
+		private Vector2 playerPosition;                     // РўРµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ
+		private Animation playerAnimation, deadAnimation;   // РР·РѕР±СЂР°Р¶РµРЅРёСЏ Р°РЅРёРјР°С†РёРё (РґРІРёР¶РµС‚СЃСЏ, dead)
+		private AnimationPlayer playerAnimator;             // РћР±СЉРµРєС‚-Р°РЅРёРјР°С†РёСЏ
 
-		// Машины, съедобные объекты и прочие параметры
-		private Texture2D[] carTextures,                    // Автомобили
-							bytheTextures;                  // Околодорожные объекты
+		// РњР°С€РёРЅС‹, СЃСЉРµРґРѕР±РЅС‹Рµ РѕР±СЉРµРєС‚С‹ Рё РїСЂРѕС‡РёРµ РїР°СЂР°РјРµС‚СЂС‹
+		private Texture2D[] carTextures,                    // РђРІС‚РѕРјРѕР±РёР»Рё
+							bytheTextures;                  // РћРєРѕР»РѕРґРѕСЂРѕР¶РЅС‹Рµ РѕР±СЉРµРєС‚С‹
 		private Animation eatable;
 		private AnimationPlayer eatableAnimator;
 		private CarState[,] carPosition = new CarState[LinesQuantity, 3];
-		private Vector2 bythePosition,                      // Позиция околодорожного объекта
-						eatablePosition;                    // Позиция съедобного объекта
+		private Vector2 bythePosition,                      // РџРѕР·РёС†РёСЏ РѕРєРѕР»РѕРґРѕСЂРѕР¶РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
+						eatablePosition;                    // РџРѕР·РёС†РёСЏ СЃСЉРµРґРѕР±РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 		private int bytheTextureNumber = 0, bytheShow = 0;
 
-		// Звуковые эффекты и их параметры
-		private SoundEffect SFailed,                        // Поражение
-							SStart, SStop, SOnOff,          // Старт, пауза, звук off/on
-							SAte,                           // Съедение
-							CBrake, CEng,                   // Торможение / разгон
-															//SBythe,							// Обгон
-							NewLev;                         // Новый уровень
-		private int soundDelay = 0;                         // Пауза между звуками CBrake, CEng и прочими
-		private bool isSound = true, isMusic = true;        // Звук и музыка в игре on/off
+		// Р—РІСѓРєРѕРІС‹Рµ СЌС„С„РµРєС‚С‹ Рё РёС… РїР°СЂР°РјРµС‚СЂС‹
+		private SoundEffect SFailed,                        // РџРѕСЂР°Р¶РµРЅРёРµ
+							SStart, SStop, SOnOff,          // РЎС‚Р°СЂС‚, РїР°СѓР·Р°, Р·РІСѓРє off/on
+							SAte,                           // РЎСЉРµРґРµРЅРёРµ
+							CBrake, CEng,                   // РўРѕСЂРјРѕР¶РµРЅРёРµ / СЂР°Р·РіРѕРЅ
+															//SBythe,							// РћР±РіРѕРЅ
+							NewLev;                         // РќРѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ
+		private int soundDelay = 0;                         // РџР°СѓР·Р° РјРµР¶РґСѓ Р·РІСѓРєР°РјРё CBrake, CEng Рё РїСЂРѕС‡РёРјРё
+		private bool isSound = true, isMusic = true;        // Р—РІСѓРє Рё РјСѓР·С‹РєР° РІ РёРіСЂРµ on/off
 
-		// Параметры Alive и Working
+		// РџР°СЂР°РјРµС‚СЂС‹ Alive Рё Working
 		private bool isAlive = false, isWorking = false;
 
-		// Очки
-		private int score = 0;                              // Выигрыш
-		private const int scoreMultiplier = 10;             // Множитель для очков
-		private const int penalty = 99;                     // Штраф за проигрыш
+		// РћС‡РєРё
+		private int score = 0;                              // Р’С‹РёРіСЂС‹С€
+		private const int scoreMultiplier = 10;             // РњРЅРѕР¶РёС‚РµР»СЊ РґР»СЏ РѕС‡РєРѕРІ
+		private const int penalty = 99;                     // РЁС‚СЂР°С„ Р·Р° РїСЂРѕРёРіСЂС‹С€
 
-		// Флаги отображения сообщений
-		private bool showLoseMsg = false,                   // Сообщение о прохождении уровня
-					 showExitMsg = false;                   // Подтверждение выхода
+		// Р¤Р»Р°РіРё РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ СЃРѕРѕР±С‰РµРЅРёР№
+		private bool showLoseMsg = false,                   // РЎРѕРѕР±С‰РµРЅРёРµ Рѕ РїСЂРѕС…РѕР¶РґРµРЅРёРё СѓСЂРѕРІРЅСЏ
+					 showExitMsg = false;                   // РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РІС‹С…РѕРґР°
 
-		// Согласователи клавиатуры
-		private int kbdDelay = 1,               // Пауза в Update-итерациях перед следующим опросом клавиатуры
-					kbdDelayTimer;              // Таймер для delay
-		private const int kbdDefDelay = 25;     // Базовый delay при нажатии клавиши
+		// РЎРѕРіР»Р°СЃРѕРІР°С‚РµР»Рё РєР»Р°РІРёР°С‚СѓСЂС‹
+		private int kbdDelay = 1,               // РџР°СѓР·Р° РІ Update-РёС‚РµСЂР°С†РёСЏС… РїРµСЂРµРґ СЃР»РµРґСѓСЋС‰РёРј РѕРїСЂРѕСЃРѕРј РєР»Р°РІРёР°С‚СѓСЂС‹
+					kbdDelayTimer;              // РўР°Р№РјРµСЂ РґР»СЏ delay
+		private const int kbdDefDelay = 25;     // Р‘Р°Р·РѕРІС‹Р№ delay РїСЂРё РЅР°Р¶Р°С‚РёРё РєР»Р°РІРёС€Рё
 
 		/// <summary>
-		/// Конструктор. Формирует рабочую область и окно приложения
+		/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ. Р¤РѕСЂРјРёСЂСѓРµС‚ СЂР°Р±РѕС‡СѓСЋ РѕР±Р»Р°СЃС‚СЊ Рё РѕРєРЅРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
 		/// </summary>
 		public RacesGame ()
 			{
-			// Создание "окна" заданного размера
+			// РЎРѕР·РґР°РЅРёРµ "РѕРєРЅР°" Р·Р°РґР°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
 			graphics = new GraphicsDeviceManager (this);
 			graphics.PreferredBackBufferWidth = BackBufferWidth;
 			graphics.PreferredBackBufferHeight = BackBufferHeight;
 
-			// Задание content-директории игры
+			// Р—Р°РґР°РЅРёРµ content-РґРёСЂРµРєС‚РѕСЂРёРё РёРіСЂС‹
 			Content.RootDirectory = "Content/Races";
 			}
 
 		/// <summary>
-		/// ИНИЦИАЛИЗАЦИЯ
-		/// Функция выполняется один раз за игру, при её запуске
-		/// Здесь располагаются все инициализации и начальные значения
+		/// РРќРР¦РРђР›РР—РђР¦РРЇ
+		/// Р¤СѓРЅРєС†РёСЏ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· Р·Р° РёРіСЂСѓ, РїСЂРё РµС‘ Р·Р°РїСѓСЃРєРµ
+		/// Р—РґРµСЃСЊ СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ РІСЃРµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Рё РЅР°С‡Р°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
 		/// </summary>
 		protected override void Initialize ()
 			{
-			// НАСТРОЙКА АППАРАТА ПРОРИСОВКИ
+			// РќРђРЎРўР РћР™РљРђ РђРџРџРђР РђРўРђ РџР РћР РРЎРћР’РљР
 			spriteBatch = new SpriteBatch (GraphicsDevice);
 
-			// СОЗДАНИЕ ГРАФИЧЕСКИХ ОБЪЕКТОВ
-			// Разные текстуры машин
+			// РЎРћР—Р”РђРќРР• Р“Р РђР¤РР§Р•РЎРљРРҐ РћР‘РЄР•РљРўРћР’
+			// Р Р°Р·РЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹ РјР°С€РёРЅ
 			carTextures = new Texture2D[]   {
 				Content.Load<Texture2D> ("Tiles/CarA01"),
 				Content.Load<Texture2D> ("Tiles/CarA02"),
@@ -147,7 +147,7 @@ namespace RD_AAOW
 				Content.Load<Texture2D> ("Tiles/CarC04")
 				};
 
-			// Разные текстуры околодорожных объектов
+			// Р Р°Р·РЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹ РѕРєРѕР»РѕРґРѕСЂРѕР¶РЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 			bytheTextures = new Texture2D[] {
 				Content.Load<Texture2D> ("Tiles/Bythe00"),
 				Content.Load<Texture2D> ("Tiles/Bythe01"),
@@ -156,18 +156,18 @@ namespace RD_AAOW
 				Content.Load<Texture2D> ("Tiles/Bythe04")
 				};
 
-			// Текстура съедобного объекта
+			// РўРµРєСЃС‚СѓСЂР° СЃСЉРµРґРѕР±РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 			eatable = new Animation (Content.Load<Texture2D> ("Tiles/Eatable"), 48, 0.1f, true);
 			eatableAnimator.PlayAnimation (eatable);
 
-			// Черепаха при столкновении и движении
+			// Р§РµСЂРµРїР°С…Р° РїСЂРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёРё Рё РґРІРёР¶РµРЅРёРё
 			playerAnimation = new Animation (Content.Load<Texture2D> ("Tiles/PlayerCar"),
 				CarState.DefWidth, 0.05f, true);
 			deadAnimation = new Animation (Content.Load<Texture2D> ("Tiles/DeadPlayerCar"),
 				CarState.DefWidth, 0.08f, true);
 			playerAnimator.PlayAnimation (playerAnimation);
 
-			// СОЗДАНИЕ ЗВУКОВЫХ ЭФФЕКТОВ
+			// РЎРћР—Р”РђРќРР• Р—Р’РЈРљРћР’Р«РҐ Р­Р¤Р¤Р•РљРўРћР’
 			SFailed = Content.Load<SoundEffect> ("Sounds/Failed");
 			SOnOff = Content.Load<SoundEffect> ("Sounds/SoundOnOff");
 			SStart = Content.Load<SoundEffect> ("Sounds/SStart");
@@ -178,37 +178,37 @@ namespace RD_AAOW
 			//SBythe = Content.Load<SoundEffect> ("Sounds/Bythe");
 			NewLev = Content.Load<SoundEffect> ("Sounds/NewL");
 
-			// СОЗДАНИЕ ШРИФТОВ
+			// РЎРћР—Р”РђРќРР• РЁР РР¤РўРћР’
 			defFont = Content.Load<SpriteFont> ("Font/DefFont");
 			midFont = Content.Load<SpriteFont> ("Font/MidFont");
 			bigFont = Content.Load<SpriteFont> ("Font/BigFont");
 
-			// ЗАГРУЗКА ДОПОЛНИТЕЛЬНЫХ ТЕКСТУР
+			// Р—РђР“Р РЈР—РљРђ Р”РћРџРћР›РќРРўР•Р›Р¬РќР«РҐ РўР•РљРЎРўРЈР 
 			back = Content.Load<Texture2D> ("Background/Back");
 			startBack = Content.Load<Texture2D> ("Background/StartBack");
 
-			// ЧТЕНИЕ НАСТРОЕК И РЕЗУЛЬТАТОВ ИГРЫ
+			// Р§РўР•РќРР• РќРђРЎРўР РћР•Рљ Р Р Р•Р—РЈР›Р¬РўРђРўРћР’ РР“Р Р«
 			GameSettings (false);
 
-			// НАСТРОЙКА МУЗЫКИ
+			// РќРђРЎРўР РћР™РљРђ РњРЈР—Р«РљР
 			MediaPlayer.IsRepeating = true;
 			if (isMusic)
 				MediaPlayer.Play (Content.Load<Song> ("Sounds/Music2"));
 
-			// Инициализация
+			// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 			base.Initialize ();
 			}
 
 		/////////////////////////////////////////////////////////////////////////////////
-		// ДИНАМИЧЕСКИЕ СОБЫТИЯ ИГРЫ
+		// Р”РРќРђРњРР§Р•РЎРљРР• РЎРћР‘Р«РўРРЇ РР“Р Р«
 
 		/// <summary>
-		/// Метод обновляет состояние игры в реальном времени
+		/// РњРµС‚РѕРґ РѕР±РЅРѕРІР»СЏРµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РёРіСЂС‹ РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё
 		/// </summary>
-		/// <param name="VGameTime">Время игры</param>
+		/// <param name="VGameTime">Р’СЂРµРјСЏ РёРіСЂС‹</param>
 		protected override void Update (GameTime VGameTime)
 			{
-			// Опрос клавиатуры с предотвращением повторов
+			// РћРїСЂРѕСЃ РєР»Р°РІРёР°С‚СѓСЂС‹ СЃ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёРµРј РїРѕРІС‚РѕСЂРѕРІ
 			kbdDelayTimer++;
 			kbdDelayTimer %= kbdDelay;
 			if (kbdDelayTimer == 0)
@@ -225,7 +225,7 @@ namespace RD_AAOW
 				}
 			KeyboardMoveProc ();
 
-			// В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ ИГРЫ
+			// Р’ Р—РђР’РРЎРРњРћРЎРўР РћРў РЎРћРЎРўРћРЇРќРРЇ РР“Р Р«
 			switch (gameStatus)
 				{
 				//////////////////////////////////////////////////////////////////
@@ -233,16 +233,16 @@ namespace RD_AAOW
 					if (isAlive)
 						{
 
-						// Движение всех объектов
+						// Р”РІРёР¶РµРЅРёРµ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ
 						if (isWorking)
 							{
-							// Движение текстуры дороги
+							// Р”РІРёР¶РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ РґРѕСЂРѕРіРё
 							if (backOffset.Y + currentSpeed >= 0.0f)
 								backOffset.Y = -back.Height / 2;
 							else
 								backOffset.Y += currentSpeed;
 
-							// Движение съедобного объекта
+							// Р”РІРёР¶РµРЅРёРµ СЃСЉРµРґРѕР±РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 							if (eatablePosition.Y + currentSpeed >= BackBufferHeight + eatable.FrameHeight)
 								{
 								eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
@@ -252,7 +252,7 @@ namespace RD_AAOW
 							else
 								eatablePosition.Y += currentSpeed;
 
-							// Движение околодорожного объекта
+							// Р”РІРёР¶РµРЅРёРµ РѕРєРѕР»РѕРґРѕСЂРѕР¶РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 							if (bythePosition.Y > BackBufferHeight + bytheTextures[bytheTextureNumber].Height)
 								{
 								bytheTextureNumber = rnd.Next (bytheTextures.Length);
@@ -263,15 +263,15 @@ namespace RD_AAOW
 							else
 								bythePosition.Y += currentSpeed;
 
-							// Движение машин
+							// Р”РІРёР¶РµРЅРёРµ РјР°С€РёРЅ
 							for (int j = 0; j < carPosition.GetLength (1); j++)
 								{
 								for (int i = 0; i < carPosition.GetLength (0); i++)
-									// Смещение всех машин
+									// РЎРјРµС‰РµРЅРёРµ РІСЃРµС… РјР°С€РёРЅ
 									carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y +
 									currentSpeed / 2);
 
-								// Обгон
+								// РћР±РіРѕРЅ
 #if false
 								if ((int)carPosition[0, j].CurrentPosition.Y == BackBufferHeight - 
 									2 * CarState.DefHeight)
@@ -280,9 +280,9 @@ namespace RD_AAOW
 											(30 - rnd.Next (60)) * 0.01f, (50 - rnd.Next (100)) * 0.01f);
 #endif
 
-								// Выход за границы уровня
+								// Р’С‹С…РѕРґ Р·Р° РіСЂР°РЅРёС†С‹ СѓСЂРѕРІРЅСЏ
 								if (carPosition[0, j].CurrentPosition.Y > BackBufferHeight + CarState.DefHeight)
-								// При выходе за границы уровня машина возвращается наверх
+								// РџСЂРё РІС‹С…РѕРґРµ Р·Р° РіСЂР°РЅРёС†С‹ СѓСЂРѕРІРЅСЏ РјР°С€РёРЅР° РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РЅР°РІРµСЂС…
 									{
 									int s = 0;
 									for (int i = 0; i < carPosition.GetLength (0); i++)
@@ -296,7 +296,7 @@ namespace RD_AAOW
 
 									if (levelNumber <= 12)
 										{
-										// Если (внезапно) восемь или семь машин окажутся активными
+										// Р•СЃР»Рё (РІРЅРµР·Р°РїРЅРѕ) РІРѕСЃРµРјСЊ РёР»Рё СЃРµРјСЊ РјР°С€РёРЅ РѕРєР°Р¶СѓС‚СЃСЏ Р°РєС‚РёРІРЅС‹РјРё
 										if (s > carPosition.GetLength (0) - 1)
 											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
 										if (s > carPosition.GetLength (0) - 2)
@@ -304,7 +304,7 @@ namespace RD_AAOW
 										}
 									else if (levelNumber <= 17)
 										{
-										// Если будет больше четырёх машин
+										// Р•СЃР»Рё Р±СѓРґРµС‚ Р±РѕР»СЊС€Рµ С‡РµС‚С‹СЂС‘С… РјР°С€РёРЅ
 										if (s > (carPosition.GetLength (0) / 2))
 											{
 											for (int i = 0; i < carPosition.GetLength (0); i++)
@@ -342,13 +342,13 @@ namespace RD_AAOW
 										carPosition[carPosition.GetLength (0) - 1, j].Enabled = 0;
 										}
 
-									// Начисление очков
+									// РќР°С‡РёСЃР»РµРЅРёРµ РѕС‡РєРѕРІ
 									carsLeft++;
 									}
 								}
 							}
 
-						// Следующий уровень
+						// РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ
 						if (carsLeft >= levelNumber * scoreMultiplier / 2)
 							{
 							if (isSound)
@@ -360,48 +360,48 @@ namespace RD_AAOW
 								LoadNextLevel ();
 							currentSpeed = levelNumber + 2;
 
-							// Запись настроек и результатов игры (в зависимости от того, есть они или нет)
+							// Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє Рё СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РёРіСЂС‹ (РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ, РµСЃС‚СЊ РѕРЅРё РёР»Рё РЅРµС‚)
 							GameSettings (true);
 							}
 
-						// Проверка столкновений с машинами
+						// РџСЂРѕРІРµСЂРєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ СЃ РјР°С€РёРЅР°РјРё
 						if (IsCollapted ())
 							{
-							// Звук
+							// Р—РІСѓРє
 							MediaPlayer.Stop ();
 							if (isSound)
 								SFailed.Play ();
 
-							// Запись настроек и результатов игры (в зависимости от того, есть они или нет)
+							// Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє Рё СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РёРіСЂС‹ (РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ, РµСЃС‚СЊ РѕРЅРё РёР»Рё РЅРµС‚)
 							GameSettings (true);
 
-							// Переключение состояния игры
+							// РџРµСЂРµРєР»СЋС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂС‹
 							isAlive = isWorking = false;
 							levelNumber--;
-							carsLeft = 0;               // Это было бы слишком просто...
+							carsLeft = 0;               // Р­С‚Рѕ Р±С‹Р»Рѕ Р±С‹ СЃР»РёС€РєРѕРј РїСЂРѕСЃС‚Рѕ...
 							playerAnimator.PlayAnimation (deadAnimation);
 
-							// Отображение сообщения
+							// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ
 							showLoseMsg = true;
 
-							// Пересчёт очков
-							score -= penalty;           // Размер штрафа
+							// РџРµСЂРµСЃС‡С‘С‚ РѕС‡РєРѕРІ
+							score -= penalty;           // Р Р°Р·РјРµСЂ С€С‚СЂР°С„Р°
 
-							// Перезапуск уровня произойдёт по нажатию клавиши Space
+							// РџРµСЂРµР·Р°РїСѓСЃРє СѓСЂРѕРІРЅСЏ РїСЂРѕРёР·РѕР№РґС‘С‚ РїРѕ РЅР°Р¶Р°С‚РёСЋ РєР»Р°РІРёС€Рё Space
 							}
 
-						// Проверка съедений
+						// РџСЂРѕРІРµСЂРєР° СЃСЉРµРґРµРЅРёР№
 						if (IsAte ())
 							{
-							// Удаление съеденного объекта
+							// РЈРґР°Р»РµРЅРёРµ СЃСЉРµРґРµРЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 							eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
 									RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
 							eatablePosition.Y = -back.Height;
 
-							// Пересчёт очков
+							// РџРµСЂРµСЃС‡С‘С‚ РѕС‡РєРѕРІ
 							score += 5 * scoreMultiplier;
 
-							// Звук
+							// Р—РІСѓРє
 							if (isSound)
 								SAte.Play ();
 							}
@@ -411,21 +411,21 @@ namespace RD_AAOW
 					//////////////////////////////////////////////////////////////////
 				}
 
-			// Обновление игры
+			// РћР±РЅРѕРІР»РµРЅРёРµ РёРіСЂС‹
 			base.Update (VGameTime);
 			}
 
 		/// <summary>
-		/// ОБРАБОТКА СОБЫТИЙ КЛАВИАТУРЫ
-		/// Низкоскоростные события
+		/// РћР‘Р РђР‘РћРўРљРђ РЎРћР‘Р«РўРР™ РљР›РђР’РРђРўРЈР Р«
+		/// РќРёР·РєРѕСЃРєРѕСЂРѕСЃС‚РЅС‹Рµ СЃРѕР±С‹С‚РёСЏ
 		/// </summary>
 		private bool KeyboardProc ()
 			{
-			// Запрос к клавиатуре
+			// Р—Р°РїСЂРѕСЃ Рє РєР»Р°РІРёР°С‚СѓСЂРµ
 			keyboardState = Keyboard.GetState ();
 
-			// В НЕЗАВИСИМОСТИ ОТ СОСТОЯНИЯ ИГРЫ
-			// Настройки звука
+			// Р’ РќР•Р—РђР’РРЎРРњРћРЎРўР РћРў РЎРћРЎРўРћРЇРќРРЇ РР“Р Р«
+			// РќР°СЃС‚СЂРѕР№РєРё Р·РІСѓРєР°
 			if (!showExitMsg)
 				{
 				if (keyboardState.IsKeyDown (Keys.S))       // Sound on/off
@@ -433,7 +433,7 @@ namespace RD_AAOW
 					isSound = !isSound;
 					SOnOff.Play ();
 
-					// Была нажата клавиша
+					// Р‘С‹Р»Р° РЅР°Р¶Р°С‚Р° РєР»Р°РІРёС€Р°
 					return true;
 					}
 
@@ -455,16 +455,16 @@ namespace RD_AAOW
 					}
 				}
 
-			// В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ ИГРЫ
+			// Р’ Р—РђР’РРЎРРњРћРЎРўР РћРў РЎРћРЎРўРћРЇРќРРЇ РР“Р Р«
 			switch (gameStatus)
 				{
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Start:
-					// Немедленный выход
+					// РќРµРјРµРґР»РµРЅРЅС‹Р№ РІС‹С…РѕРґ
 					if (keyboardState.IsKeyDown (Keys.Escape))
 						this.Exit ();
 
-					// Справка
+					// РЎРїСЂР°РІРєР°
 					if (keyboardState.IsKeyDown (Keys.F1))
 						{
 						gameStatus = GameStatus.Help;
@@ -472,7 +472,7 @@ namespace RD_AAOW
 						return true;
 						}
 
-					// Выбор языка интерфеса
+					// Р’С‹Р±РѕСЂ СЏР·С‹РєР° РёРЅС‚РµСЂС„РµСЃР°
 					if (keyboardState.IsKeyDown (Keys.L))
 						{
 						gameStatus = GameStatus.Language;
@@ -480,13 +480,13 @@ namespace RD_AAOW
 						return true;
 						}
 
-					// Переход далее
+					// РџРµСЂРµС…РѕРґ РґР°Р»РµРµ
 					if (keyboardState.IsKeyDown (Keys.Space))
 						{
-						// Переключение параметров
+						// РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 						gameStatus = GameStatus.Playing;
 
-						// Загрузка уровня
+						// Р—Р°РіСЂСѓР·РєР° СѓСЂРѕРІРЅСЏ
 						LoadNextLevel ();
 
 						return true;
@@ -497,7 +497,7 @@ namespace RD_AAOW
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Help:
 				case GameStatus.Language:
-					// Возврат
+					// Р’РѕР·РІСЂР°С‚
 					if (keyboardState.IsKeyDown (Keys.Escape))
 						{
 						gameStatus = GameStatus.Start;
@@ -510,8 +510,8 @@ namespace RD_AAOW
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Playing:
 
-					// Нажатие паузы и продолжения
-					if (!showExitMsg)           // Нельзя ничего делать, если появилось сообщение о выходе
+					// РќР°Р¶Р°С‚РёРµ РїР°СѓР·С‹ Рё РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ
+					if (!showExitMsg)           // РќРµР»СЊР·СЏ РЅРёС‡РµРіРѕ РґРµР»Р°С‚СЊ, РµСЃР»Рё РїРѕСЏРІРёР»РѕСЃСЊ СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РІС‹С…РѕРґРµ
 						{
 						if (isAlive && keyboardState.IsKeyDown (Keys.Space))    // Pause
 							{
@@ -533,7 +533,7 @@ namespace RD_AAOW
 							return true;
 							}
 
-						// Нажатие клавиши продолжения
+						// РќР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ
 						if (keyboardState.IsKeyDown (Keys.Space) && !isWorking && !isAlive)
 							{
 							LoadNextLevel ();
@@ -541,16 +541,16 @@ namespace RD_AAOW
 							return true;
 							}
 
-						// Проверка на выход
+						// РџСЂРѕРІРµСЂРєР° РЅР° РІС‹С…РѕРґ
 						if (keyboardState.IsKeyDown (Keys.Escape))
 							{
-							// Пауза
+							// РџР°СѓР·Р°
 							isWorking = false;
 
-							// Сообщение
+							// РЎРѕРѕР±С‰РµРЅРёРµ
 							showExitMsg = true;
 
-							// Звук
+							// Р—РІСѓРє
 							if (isSound)
 								SStop.Play ();
 
@@ -558,14 +558,14 @@ namespace RD_AAOW
 							}
 						}
 
-					// Попытка выхода
+					// РџРѕРїС‹С‚РєР° РІС‹С…РѕРґР°
 					if (showExitMsg)
 						{
-						// Выход из игры (yes)
+						// Р’С‹С…РѕРґ РёР· РёРіСЂС‹ (yes)
 						if (keyboardState.IsKeyDown (Keys.Y))
 							this.Exit ();
 
-						// Продолжение (back)
+						// РџСЂРѕРґРѕР»Р¶РµРЅРёРµ (back)
 						if (keyboardState.IsKeyDown (Keys.N))
 							{
 							showExitMsg = false;
@@ -580,7 +580,7 @@ namespace RD_AAOW
 				case GameStatus.Finish:
 					if (keyboardState.IsKeyDown (Keys.Space))
 						{
-						// Переключение
+						// РџРµСЂРµРєР»СЋС‡РµРЅРёРµ
 						gameStatus = GameStatus.Start;
 
 						return true;
@@ -591,36 +591,36 @@ namespace RD_AAOW
 					//////////////////////////////////////////////////////////////////
 				}
 
-			// Не было ни одного нажатия
+			// РќРµ Р±С‹Р»Рѕ РЅРё РѕРґРЅРѕРіРѕ РЅР°Р¶Р°С‚РёСЏ
 			return false;
 			}
 
 		/// <summary>
-		/// ОБРАБОТКА СОБЫТИЙ КЛАВИАТУРЫ
-		/// Высокоскоростные события
+		/// РћР‘Р РђР‘РћРўРљРђ РЎРћР‘Р«РўРР™ РљР›РђР’РРђРўРЈР Р«
+		/// Р’С‹СЃРѕРєРѕСЃРєРѕСЂРѕСЃС‚РЅС‹Рµ СЃРѕР±С‹С‚РёСЏ
 		/// </summary>
 		private void KeyboardMoveProc ()
 			{
 			keyboardState = Keyboard.GetState ();
 
-			// Нажатие клавиш управления
+			// РќР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€ СѓРїСЂР°РІР»РµРЅРёСЏ
 			if ((gameStatus == GameStatus.Playing) && !showExitMsg && isWorking)
 				{
-				// ВЛЕВО
+				// Р’Р›Р•Р’Рћ
 				if (keyboardState.IsKeyDown (Keys.Left) && (playerPosition.X - scoreMultiplier >=
 					RoadLeft + CarState.DefWidth / 2 - 5))
 					{
 					playerPosition.X -= scoreMultiplier / 2;
 					}
 
-				// ВПРАВО
+				// Р’РџР РђР’Рћ
 				if (keyboardState.IsKeyDown (Keys.Right) && (playerPosition.X + scoreMultiplier <=
 					BackBufferWidth - CarState.DefWidth / 2 - 5))
 					{
 					playerPosition.X += scoreMultiplier / 2;
 					}
 
-				// ВНИЗ (HINT)
+				// Р’РќРР— (HINT)
 				if (keyboardState.IsKeyUp (Keys.Down) && keyboardState.IsKeyUp (Keys.Up) && (soundDelay != -1))
 					soundDelay = -1;
 
@@ -633,7 +633,7 @@ namespace RD_AAOW
 					for (int j = 0; j < carPosition.GetLength (1); j++)
 						{
 						for (int i = 0; i < carPosition.GetLength (0); i++)
-							// Смещение всех машин
+							// РЎРјРµС‰РµРЅРёРµ РІСЃРµС… РјР°С€РёРЅ
 							carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y - currentSpeed / 2);
 						}
 
@@ -647,7 +647,7 @@ namespace RD_AAOW
 						}
 					}
 
-				// ВВЕРХ (HINT)
+				// Р’Р’Р•Р РҐ (HINT)
 				if (keyboardState.IsKeyDown (Keys.Up))
 					{
 					backOffset.Y += currentSpeed;
@@ -657,7 +657,7 @@ namespace RD_AAOW
 					for (int j = 0; j < carPosition.GetLength (1); j++)
 						{
 						for (int i = 0; i < carPosition.GetLength (0); i++)
-							// Смещение всех машин
+							// РЎРјРµС‰РµРЅРёРµ РІСЃРµС… РјР°С€РёРЅ
 							carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y + currentSpeed);
 						}
 
@@ -673,17 +673,17 @@ namespace RD_AAOW
 			}
 
 		/// <summary>
-		/// Отображение информации игры (очки и уровень)
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё РёРіСЂС‹ (РѕС‡РєРё Рё СѓСЂРѕРІРµРЅСЊ)
 		/// </summary>
 		private void DrawInfo ()
 			{
-			// Строки для отображения
+			// РЎС‚СЂРѕРєРё РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 			if (string.IsNullOrWhiteSpace (stPoints))
 				{
-				stPoints = Localization.GetText ("Points");
-				stCarsLeft = Localization.GetText ("CarsLeft");
-				stLevel = Localization.GetText ("Level");
-				stPause = Localization.GetText ("Pause");
+				stPoints = RDLocale.GetText ("Points");
+				stCarsLeft = RDLocale.GetText ("CarsLeft");
+				stLevel = RDLocale.GetText ("Level");
+				stPause = RDLocale.GetText ("Pause");
 				}
 
 			string S1,
@@ -694,7 +694,7 @@ namespace RD_AAOW
 			else
 				S1 = stPause;
 
-			// Векторы позиций для отображения элементов
+			// Р’РµРєС‚РѕСЂС‹ РїРѕР·РёС†РёР№ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ
 			Vector2 V1 = new Vector2 (12, 16),
 					V2 = new Vector2 (12, 48),
 					V3 = new Vector2 (12, 80),
@@ -706,7 +706,7 @@ namespace RD_AAOW
 			if (isAlive)
 				DrawShadowedString (midFont, S3, V3, RacesGameColors.Green);
 
-			// Если есть музыка или звук, выводить соответствующий знак
+			// Р•СЃР»Рё РµСЃС‚СЊ РјСѓР·С‹РєР° РёР»Рё Р·РІСѓРє, РІС‹РІРѕРґРёС‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ Р·РЅР°Рє
 			if (isMusic)
 				DrawShadowedString (defFont, "[\x266B]", V4, RacesGameColors.Yellow);
 			else
@@ -720,14 +720,14 @@ namespace RD_AAOW
 		private string stLevel, stPause, stCarsLeft, stPoints;
 
 		/// <summary>
-		/// Отображение сообщения о проигрыше
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ Рѕ РїСЂРѕРёРіСЂС‹С€Рµ
 		/// </summary>
 		private void ShowLoseMessage ()
 			{
-			// Сборка строк
+			// РЎР±РѕСЂРєР° СЃС‚СЂРѕРє
 			if (string.IsNullOrWhiteSpace (stLoseLines[0]))
 				{
-				string[] values = Localization.GetText ("LoseLines").Split (splitter,
+				string[] values = RDLocale.GetText ("LoseLines").Split (splitter,
 					StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < stLoseLines.Length; i++)
 					stLoseLines[i] = values[i];
@@ -750,14 +750,14 @@ namespace RD_AAOW
 		private char[] splitter = new char[] { '\t' };
 
 		/// <summary>
-		/// Отображение сообщения о начале игры
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ Рѕ РЅР°С‡Р°Р»Рµ РёРіСЂС‹
 		/// </summary>
 		private void ShowStartMessage ()
 			{
-			// Сборка строк
+			// РЎР±РѕСЂРєР° СЃС‚СЂРѕРє
 			if (string.IsNullOrWhiteSpace (stStartLines[0]))
 				{
-				string[] values = Localization.GetText ("StartLines").Split (splitter,
+				string[] values = RDLocale.GetText ("StartLines").Split (splitter,
 					StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < stStartLines.Length - 1; i++)
 					stStartLines[i] = values[i];
@@ -782,14 +782,14 @@ namespace RD_AAOW
 		private string[] stStartLines = new string[4];
 
 		/// <summary>
-		/// Отображение сообщения о конце игры
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ Рѕ РєРѕРЅС†Рµ РёРіСЂС‹
 		/// </summary>
 		private void ShowFinishMessage ()
 			{
-			// Сборка строк
+			// РЎР±РѕСЂРєР° СЃС‚СЂРѕРє
 			if (string.IsNullOrWhiteSpace (stSuccessLines[0]))
 				{
-				string[] values = Localization.GetText ("SuccessLines").Split (splitter,
+				string[] values = RDLocale.GetText ("SuccessLines").Split (splitter,
 					StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < stSuccessLines.Length; i++)
 					stSuccessLines[i] = values[i];
@@ -811,14 +811,14 @@ namespace RD_AAOW
 		private string[] stSuccessLines = new string[3];
 
 		/// <summary>
-		/// Отображение запроса на подтверждение выхода
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ Р·Р°РїСЂРѕСЃР° РЅР° РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РІС‹С…РѕРґР°
 		/// </summary>
 		private void ShowExitMessage ()
 			{
-			// Сборка строк
+			// РЎР±РѕСЂРєР° СЃС‚СЂРѕРє
 			if (string.IsNullOrWhiteSpace (stExitLines[0]))
 				{
-				string[] values = Localization.GetText ("ExitLines").Split (splitter,
+				string[] values = RDLocale.GetText ("ExitLines").Split (splitter,
 					StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < stExitLines.Length; i++)
 					stExitLines[i] = values[i];
@@ -837,16 +837,16 @@ namespace RD_AAOW
 		private string[] stExitLines = new string[4];
 
 		/// <summary>
-		/// Отображение вспомогательных интерфейсов
+		/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… РёРЅС‚РµСЂС„РµР№СЃРѕРІ
 		/// </summary>
 		private void ShowServiceMessage (bool Language)
 			{
-			// Защита от множественного входа
+			// Р—Р°С‰РёС‚Р° РѕС‚ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРіРѕ РІС…РѕРґР°
 			if (showingServiceMessage)
 				return;
 			showingServiceMessage = true;
 
-			// Блокировка отрисовки и запуск справки
+			// Р‘Р»РѕРєРёСЂРѕРІРєР° РѕС‚СЂРёСЃРѕРІРєРё Рё Р·Р°РїСѓСЃРє СЃРїСЂР°РІРєРё
 			spriteBatch.End ();
 
 			if (Language)
@@ -856,27 +856,27 @@ namespace RD_AAOW
 
 			spriteBatch.Begin ();
 
-			// Выход в меню
+			// Р’С‹С…РѕРґ РІ РјРµРЅСЋ
 			gameStatus = GameStatus.Start;
 			showingServiceMessage = false;
 			}
 		private bool showingServiceMessage = false;
 
 		/// <summary>
-		/// Отрисовка уровня игры
+		/// РћС‚СЂРёСЃРѕРІРєР° СѓСЂРѕРІРЅСЏ РёРіСЂС‹
 		/// </summary>
 		protected override void Draw (GameTime VGameTime)
 			{
-			// Создание чистого окна и запуск рисования
+			// РЎРѕР·РґР°РЅРёРµ С‡РёСЃС‚РѕРіРѕ РѕРєРЅР° Рё Р·Р°РїСѓСЃРє СЂРёСЃРѕРІР°РЅРёСЏ
 			graphics.GraphicsDevice.Clear (RacesGameColors.Black);
 			spriteBatch.Begin ();
 
-			// В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ ИГРЫ
+			// Р’ Р—РђР’РРЎРРњРћРЎРўР РћРў РЎРћРЎРўРћРЇРќРРЇ РР“Р Р«
 			switch (gameStatus)
 				{
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Start:
-					// Отображает стартовый экран
+					// РћС‚РѕР±СЂР°Р¶Р°РµС‚ СЃС‚Р°СЂС‚РѕРІС‹Р№ СЌРєСЂР°РЅ
 					ShowStartMessage ();
 					break;
 
@@ -891,15 +891,15 @@ namespace RD_AAOW
 
 				//////////////////////////////////////////////////////////////////
 				case GameStatus.Playing:
-					// ОТОБРАЖЕНИЕ УРОВНЯ
+					// РћРўРћР‘Р РђР–Р•РќРР• РЈР РћР’РќРЇ
 					spriteBatch.Draw (back, backOffset, RacesGameColors.White);
 
-					// ОТОБРАЖЕНИЕ ИЗОБРАЖЕНИЙ
-					// Съедобный объект
+					// РћРўРћР‘Р РђР–Р•РќРР• РР—РћР‘Р РђР–Р•РќРР™
+					// РЎСЉРµРґРѕР±РЅС‹Р№ РѕР±СЉРµРєС‚
 					eatableAnimator.Draw (VGameTime, spriteBatch, eatablePosition, SpriteEffects.None,
 						RacesGameColors.White, 0.0f);
 
-					// Околодорожный объект
+					// РћРєРѕР»РѕРґРѕСЂРѕР¶РЅС‹Р№ РѕР±СЉРµРєС‚
 					if (bytheShow == 1)
 						spriteBatch.Draw (bytheTextures[bytheTextureNumber],
 							new Rectangle ((int)bythePosition.X, (int)bythePosition.Y,
@@ -911,7 +911,7 @@ namespace RD_AAOW
 								0.0f, new Vector2 (bytheTextures[bytheTextureNumber].Width / 2,
 								bytheTextures[bytheTextureNumber].Height / 2), SpriteEffects.None, 0.0f);
 
-					// Автомобили (ещё выше)
+					// РђРІС‚РѕРјРѕР±РёР»Рё (РµС‰С‘ РІС‹С€Рµ)
 					for (int i = 0; i < carPosition.GetLength (0); i++)
 						for (int j = 0; j < carPosition.GetLength (1); j++)
 							if (carPosition[i, j].Enabled == 1)
@@ -920,14 +920,14 @@ namespace RD_AAOW
 									carPosition[i, j].SourceRect, RacesGameColors.White,
 									0.0f, carPosition[i, j].Origin, SpriteEffects.None, 0.0f);
 
-					// Игрок (над ними)
+					// РРіСЂРѕРє (РЅР°Рґ РЅРёРјРё)
 					playerAnimator.Draw (VGameTime, spriteBatch, playerPosition, SpriteEffects.None,
 						RacesGameColors.White, 0.0f);
 
-					// ОТОБРАЖЕНИЕ ИНФОРМАЦИИ УРОВНЯ
+					// РћРўРћР‘Р РђР–Р•РќРР• РРќР¤РћР РњРђР¦РР РЈР РћР’РќРЇ
 					DrawInfo ();
 
-					// Отображение сообщений (если они вызваны)
+					// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№ (РµСЃР»Рё РѕРЅРё РІС‹Р·РІР°РЅС‹)
 					if (showLoseMsg)
 						ShowLoseMessage ();
 
@@ -943,35 +943,35 @@ namespace RD_AAOW
 					break;
 				}
 
-			// Завершение рисования
+			// Р—Р°РІРµСЂС€РµРЅРёРµ СЂРёСЃРѕРІР°РЅРёСЏ
 			spriteBatch.End ();
 
-			// Перерисовка
+			// РџРµСЂРµСЂРёСЃРѕРІРєР°
 			base.Draw (VGameTime);
 			}
 
 		/// <summary>
-		/// Загрузка следующего уровня игры
+		/// Р—Р°РіСЂСѓР·РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СѓСЂРѕРІРЅСЏ РёРіСЂС‹
 		/// </summary>
 		private void LoadNextLevel ()
 			{
-			// Возобновление игры
+			// Р’РѕР·РѕР±РЅРѕРІР»РµРЅРёРµ РёРіСЂС‹
 			isAlive = true;
 
-			// Запуск фоновой мелодии
+			// Р—Р°РїСѓСЃРє С„РѕРЅРѕРІРѕР№ РјРµР»РѕРґРёРё
 			MediaPlayer.Stop ();
 			if (isMusic)
 				MediaPlayer.Play (Content.Load<Song> ("Sounds/Music1"));
 
-			// Поиск следующего имеющегося уровня
+			// РџРѕРёСЃРє СЃР»РµРґСѓСЋС‰РµРіРѕ РёРјРµСЋС‰РµРіРѕСЃСЏ СѓСЂРѕРІРЅСЏ
 			while (true)
 				{
-				// Поиск С АВТОСМЕЩЕНИЕМ НА СЛЕДУЮЩИЙ УРОВЕНЬ
+				// РџРѕРёСЃРє РЎ РђР’РўРћРЎРњР•Р©Р•РќРР•Рњ РќРђ РЎР›Р•Р”РЈР®Р©РР™ РЈР РћР’Р•РќР¬
 				levelNumber++;
 				if (levelNumber < levelsQuantity + 1)
 					break;
 
-				// Перезапуск с нулевого уровня в конце игры
+				// РџРµСЂРµР·Р°РїСѓСЃРє СЃ РЅСѓР»РµРІРѕРіРѕ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС†Рµ РёРіСЂС‹
 				levelNumber = -1;
 				isAlive = isWorking = false;
 				gameStatus = GameStatus.Finish;
@@ -979,25 +979,25 @@ namespace RD_AAOW
 					MediaPlayer.Play (Content.Load<Song> ("Sounds/Music2"));
 				}
 
-			// ПЕРЕЗАГРУЗКА МАССИВОВ МАШИН И СЪЕДОБНЫХ ОБЪЕКТОВ
-			// Очистка
+			// РџР•Р Р•Р—РђР“Р РЈР—РљРђ РњРђРЎРЎРР’РћР’ РњРђРЁРРќ Р РЎРЄР•Р”РћР‘РќР«РҐ РћР‘РЄР•РљРўРћР’
+			// РћС‡РёСЃС‚РєР°
 			GenerateLevelObjects ();
 
-			// Установка стартовых параметров
+			// РЈСЃС‚Р°РЅРѕРІРєР° СЃС‚Р°СЂС‚РѕРІС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 			playerAnimator.PlayAnimation (playerAnimation);
 			playerPosition.X = RoadLeft + RoadLineWidth * LinesQuantity / 2;
 			playerPosition.Y = BackBufferHeight - CarState.DefHeight;
 
-			// Смена сообщения
+			// РЎРјРµРЅР° СЃРѕРѕР±С‰РµРЅРёСЏ
 			showLoseMsg = false;
 			}
 
 		/// <summary>
-		/// Метод проверяет столкновение с препятствиями
+		/// РњРµС‚РѕРґ РїСЂРѕРІРµСЂСЏРµС‚ СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ СЃ РїСЂРµРїСЏС‚СЃС‚РІРёСЏРјРё
 		/// </summary>
 		private bool IsCollapted ()
 			{
-			// Проверка на столкновение с машиной
+			// РџСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ СЃ РјР°С€РёРЅРѕР№
 			for (int i = 0; i < carPosition.GetLength (0); i++)
 				for (int j = 0; j < carPosition.GetLength (1); j++)
 					if ((carPosition[i, j].Enabled == 1) &&
@@ -1005,12 +1005,12 @@ namespace RD_AAOW
 						(Math.Abs (playerPosition.Y - carPosition[i, j].CurrentPosition.Y) < CarState.DefHeight - 12))
 						return true;
 
-			// Не было столкновений
+			// РќРµ Р±С‹Р»Рѕ СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№
 			return false;
 			}
 
 		/// <summary>
-		/// Метод проверяет съедение объекта
+		/// РњРµС‚РѕРґ РїСЂРѕРІРµСЂСЏРµС‚ СЃСЉРµРґРµРЅРёРµ РѕР±СЉРµРєС‚Р°
 		/// </summary>
 		private bool IsAte ()
 			{
@@ -1020,17 +1020,17 @@ namespace RD_AAOW
 				CarState.DefWidth / 2 + eatable.FrameWidth / 2 - 15))
 				return true;
 
-			// Не было съедения
+			// РќРµ Р±С‹Р»Рѕ СЃСЉРµРґРµРЅРёСЏ
 			return false;
 			}
 
 		/// <summary>
-		/// Метод выводит строку текста
+		/// РњРµС‚РѕРґ РІС‹РІРѕРґРёС‚ СЃС‚СЂРѕРєСѓ С‚РµРєСЃС‚Р°
 		/// </summary>
-		/// <param name="VFont">Шрифт текста</param>
-		/// <param name="VString">Строка текста</param>
-		/// <param name="VPosition">Позиция отрисовки</param>
-		/// <param name="VColor">Цвет текста</param>
+		/// <param name="VFont">РЁСЂРёС„С‚ С‚РµРєСЃС‚Р°</param>
+		/// <param name="VString">РЎС‚СЂРѕРєР° С‚РµРєСЃС‚Р°</param>
+		/// <param name="VPosition">РџРѕР·РёС†РёСЏ РѕС‚СЂРёСЃРѕРІРєРё</param>
+		/// <param name="VColor">Р¦РІРµС‚ С‚РµРєСЃС‚Р°</param>
 		private void DrawShadowedString (SpriteFont VFont, string VString, Vector2 VPosition, Color VColor)
 			{
 			spriteBatch.DrawString (VFont, VString, VPosition + new Vector2 (1, 1), RacesGameColors.Black);
@@ -1041,12 +1041,12 @@ namespace RD_AAOW
 			}
 
 		/// <summary>
-		/// Метод выполняет чтение / запись настроек игры
+		/// РњРµС‚РѕРґ РІС‹РїРѕР»РЅСЏРµС‚ С‡С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє РёРіСЂС‹
 		/// </summary>
-		/// <param name="Write">Флаг режима записи настроек</param>
+		/// <param name="Write">Р¤Р»Р°Рі СЂРµР¶РёРјР° Р·Р°РїРёСЃРё РЅР°СЃС‚СЂРѕРµРє</param>
 		private void GameSettings (bool Write)
 			{
-			// Если требуется запись
+			// Р•СЃР»Рё С‚СЂРµР±СѓРµС‚СЃСЏ Р·Р°РїРёСЃСЊ
 			if (Write)
 				{
 				RDGenerics.SetAppSettingsValue ("Level", (levelNumber - 1).ToString ());
@@ -1055,7 +1055,7 @@ namespace RD_AAOW
 				RDGenerics.SetAppSettingsValue ("Sound", isSound.ToString ());
 				}
 
-			// Если требуется чтение, и файл при этом существует
+			// Р•СЃР»Рё С‚СЂРµР±СѓРµС‚СЃСЏ С‡С‚РµРЅРёРµ, Рё С„Р°Р№Р» РїСЂРё СЌС‚РѕРј СЃСѓС‰РµСЃС‚РІСѓРµС‚
 			else
 				{
 				try
@@ -1071,15 +1071,15 @@ namespace RD_AAOW
 			}
 
 		/// <summary>
-		/// Метод генерирует новые объекты игры
+		/// РњРµС‚РѕРґ РіРµРЅРµСЂРёСЂСѓРµС‚ РЅРѕРІС‹Рµ РѕР±СЉРµРєС‚С‹ РёРіСЂС‹
 		/// </summary>
 		private void GenerateLevelObjects ()
 			{
-			// Машины
+			// РњР°С€РёРЅС‹
 			for (int j = 0; j < carPosition.GetLength (1); j++)
 				{
 				int s = 0, b;
-				// Для одной полосы скорость всех машин одинакова
+				// Р”Р»СЏ РѕРґРЅРѕР№ РїРѕР»РѕСЃС‹ СЃРєРѕСЂРѕСЃС‚СЊ РІСЃРµС… РјР°С€РёРЅ РѕРґРёРЅР°РєРѕРІР°
 				for (int i = 0; i < carPosition.GetLength (0); i++)
 					{
 					b = rnd.Next (2);
@@ -1087,17 +1087,17 @@ namespace RD_AAOW
 					carPosition[i, j] = new CarState (rnd.Next (carTextures.Length), i, j, b);
 					}
 
-				// Если (внезапно) все восемь машин окажутся активными
+				// Р•СЃР»Рё (РІРЅРµР·Р°РїРЅРѕ) РІСЃРµ РІРѕСЃРµРјСЊ РјР°С€РёРЅ РѕРєР°Р¶СѓС‚СЃСЏ Р°РєС‚РёРІРЅС‹РјРё
 				if (s == carPosition.GetLength (0))
 					carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
 				}
 
-			// Первый съедобный объект
+			// РџРµСЂРІС‹Р№ СЃСЉРµРґРѕР±РЅС‹Р№ РѕР±СЉРµРєС‚
 			eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
 				RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
 			eatablePosition.Y = -BackBufferHeight;
 
-			// Первый околодорожный объект
+			// РџРµСЂРІС‹Р№ РѕРєРѕР»РѕРґРѕСЂРѕР¶РЅС‹Р№ РѕР±СЉРµРєС‚
 			bytheTextureNumber = rnd.Next (bytheTextures.Length);
 			bythePosition.X = (3 * RoadLeft / 2 - bytheTextures[bytheTextureNumber].Width) / 2;
 			bythePosition.Y = -bytheTextures[bytheTextureNumber].Height;
