@@ -87,12 +87,6 @@ namespace RD_AAOW
 			bool _ = RDGenerics.IsRegistryAccessible;
 
 			// Выполнение проверки на наличие всех необходимых файлов
-			/*for (int i = 0; i < Pths.Length; i++)
-				if (!File.Exists (".\\Content\\Races\\" + Pths[i]))
-					{
-					RDGenerics.LocalizedMessageBox (RDMessageTypes.Error_Center, "MissingFile");
-					return;
-					}*/
 			if (!RDGenerics.CheckLibraries (Pths, "Content\\" + ProgramDescription.AssemblyMainName +
 				"\\", true))
 				return;
