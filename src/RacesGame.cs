@@ -20,7 +20,7 @@ namespace RD_AAOW
 		private SpriteBatch spriteBatch;                    // Sprite-отрисовка
 		private KeyboardState keyboardState;                // Состояние клавиатуры
 		private SpriteFont defFont, midFont, bigFont;       // Шрифты
-		private Random rnd = new Random ();                 // ГСЧ
+		/*private Random rnd = new Random ();                 // ГСЧ*/
 
 		/// <summary>
 		/// Ширина окна
@@ -52,55 +52,115 @@ namespace RD_AAOW
 		// Начальный статус игры (статусы перечислены в Auxilitary.cs)
 
 		// Описатели уровня и окна сообщений
-		private int levelNumber = 0,                        // Номер текущего уровня
-					carsLeft = 0,                           // Количество пройденных машин
-					currentSpeed = 3;                       // Скорость игрока
-		private const int levelsQuantity = 30;              // Число уровней
-		private Texture2D back,                             // Фон игры
-						  startBack;                        // Фон на старте
-		private Vector2 backOffset;                         // Смещение текстуры дороги
+
+		// Номер текущего уровня
+		private int levelNumber = 0;
+
+		// Количество пройденных машин
+		private int carsLeft = 0;
+
+		// Скорость игрока
+		private int currentSpeed = 3;
+
+		// Число уровней
+		private const int levelsQuantity = 30;
+
+		// Фон игры
+		private Texture2D back;
+
+		// Фон на старте
+		private Texture2D startBack;
+
+		// Смещение текстуры дороги
+		private Vector2 backOffset;
 
 		// Текущая позиция игрока и его объекты анимации
-		private Vector2 playerPosition;                     // Текущая позиция
-		private Animation playerAnimation, deadAnimation;   // Изображения анимации (движется, dead)
-		private AnimationPlayer playerAnimator;             // Объект-анимация
+
+		// Текущая позиция
+		private Vector2 playerPosition;
+
+		// Изображения анимации (движется, dead)
+		private Animation playerAnimation, deadAnimation;
+
+		// Объект-анимация
+		private AnimationPlayer playerAnimator;
 
 		// Машины, съедобные объекты и прочие параметры
-		private Texture2D[] carTextures,                    // Автомобили
-							bytheTextures;                  // Околодорожные объекты
+
+		// Автомобили
+		private Texture2D[] carTextures;
+
+		// Околодорожные объекты
+		private Texture2D[] bytheTextures;
 		private Animation eatable;
 		private AnimationPlayer eatableAnimator;
 		private CarState[,] carPosition = new CarState[LinesQuantity, 3];
-		private Vector2 bythePosition,                      // Позиция околодорожного объекта
-						eatablePosition;                    // Позиция съедобного объекта
+
+		// Позиция околодорожного объекта
+		private Vector2 bythePosition;
+
+		// Позиция съедобного объекта
+		private Vector2 eatablePosition;
 		private int bytheTextureNumber = 0, bytheShow = 0;
 
 		// Звуковые эффекты и их параметры
-		private SoundEffect SFailed,                        // Поражение
-							SStart, SStop, SOnOff,          // Старт, пауза, звук off/on
-							SAte,                           // Съедение
-							CBrake, CEng,                   // Торможение / разгон
-															//SBythe,							// Обгон
-							NewLev;                         // Новый уровень
-		private int soundDelay = 0;                         // Пауза между звуками CBrake, CEng и прочими
-		private bool isSound = true, isMusic = true;        // Звук и музыка в игре on/off
+
+		// Поражение
+		private SoundEffect SFailed;
+
+		// Старт, пауза, звук off/on
+		private SoundEffect SStart, SStop, SOnOff;
+
+		// Съедение
+		private SoundEffect SAte;
+
+		// Торможение / разгон
+		private SoundEffect CBrake, CEng;
+
+		// Обгон
+		//private SoundEffect SBythe;
+
+		// Новый уровень
+		private SoundEffect NewLev;
+
+		// Пауза между звуками CBrake, CEng и прочими
+		private int soundDelay = 0;
+
+		// Звук и музыка в игре on/off
+		private bool isSound = true, isMusic = true;
 
 		// Параметры Alive и Working
 		private bool isAlive = false, isWorking = false;
 
 		// Очки
-		private int score = 0;                              // Выигрыш
-		private const int scoreMultiplier = 10;             // Множитель для очков
-		private const int penalty = 99;                     // Штраф за проигрыш
+
+		// Выигрыш
+		private int score = 0;
+
+		// Множитель для очков
+		private const int scoreMultiplier = 10;
+
+		// Штраф за проигрыш
+		private const int penalty = 99;
 
 		// Флаги отображения сообщений
-		private bool showLoseMsg = false,                   // Сообщение о прохождении уровня
-					 showExitMsg = false;                   // Подтверждение выхода
+
+		// Сообщение о прохождении уровня
+		private bool showLoseMsg = false;
+
+		// Подтверждение выхода
+		private bool showExitMsg = false;
 
 		// Согласователи клавиатуры
-		private int kbdDelay = 1,               // Пауза в Update-итерациях перед следующим опросом клавиатуры
-					kbdDelayTimer;              // Таймер для delay
-		private const int kbdDefDelay = 25;     // Базовый delay при нажатии клавиши
+
+		// Пауза в Update-итерациях перед следующим опросом клавиатуры
+		private int kbdDelay = 1;
+
+		// Таймер для delay
+		private int kbdDelayTimer;
+
+		// Базовый delay при нажатии клавиши
+		private const int kbdDefDelay = 25;
 
 		/// <summary>
 		/// Конструктор. Формирует рабочую область и окно приложения
@@ -245,7 +305,7 @@ namespace RD_AAOW
 							// Движение съедобного объекта
 							if (eatablePosition.Y + currentSpeed >= BackBufferHeight + eatable.FrameHeight)
 								{
-								eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
+								eatablePosition.X = RDGenerics.RND.Next (RoadLeft + eatable.FrameWidth / 2,
 									RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
 								eatablePosition.Y = -BackBufferHeight;
 								}
@@ -255,10 +315,10 @@ namespace RD_AAOW
 							// Движение околодорожного объекта
 							if (bythePosition.Y > BackBufferHeight + bytheTextures[bytheTextureNumber].Height)
 								{
-								bytheTextureNumber = rnd.Next (bytheTextures.Length);
+								bytheTextureNumber = RDGenerics.RND.Next (bytheTextures.Length);
 								bythePosition.X = (3 * RoadLeft / 2 - bytheTextures[bytheTextureNumber].Width) / 2;
 								bythePosition.Y = -bytheTextures[bytheTextureNumber].Height;
-								bytheShow = rnd.Next (2);
+								bytheShow = RDGenerics.RND.Next (2);
 								}
 							else
 								bythePosition.Y += currentSpeed;
@@ -288,9 +348,9 @@ namespace RD_AAOW
 									for (int i = 0; i < carPosition.GetLength (0); i++)
 										{
 										score += carPosition[i, j].Enabled;
-										carPosition[i, j].Enabled = rnd.Next (2);
+										carPosition[i, j].Enabled = RDGenerics.RND.Next (2);
 										s += carPosition[i, j].Enabled;
-										carPosition[i, j].TextureNumber = rnd.Next (carTextures.Length);
+										carPosition[i, j].TextureNumber = RDGenerics.RND.Next (carTextures.Length);
 										carPosition[i, j].SetCurrentPosY (-BackBufferHeight);
 										}
 
@@ -298,9 +358,9 @@ namespace RD_AAOW
 										{
 										// Если (внезапно) восемь или семь машин окажутся активными
 										if (s > carPosition.GetLength (0) - 1)
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 0;
 										if (s > carPosition.GetLength (0) - 2)
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 0;
 										}
 									else if (levelNumber <= 17)
 										{
@@ -310,10 +370,10 @@ namespace RD_AAOW
 											for (int i = 0; i < carPosition.GetLength (0); i++)
 												carPosition[i, j].Enabled = 0;
 
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
 											}
 										}
 									else if (levelNumber <= 22)
@@ -323,8 +383,8 @@ namespace RD_AAOW
 											for (int i = 0; i < carPosition.GetLength (0); i++)
 												carPosition[i, j].Enabled = 0;
 
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
 											}
 										}
 									else if (levelNumber <= 28)
@@ -334,7 +394,7 @@ namespace RD_AAOW
 											for (int i = 0; i < carPosition.GetLength (0); i++)
 												carPosition[i, j].Enabled = 0;
 
-											carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 1;
+											carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 1;
 											}
 										}
 									else
@@ -394,8 +454,8 @@ namespace RD_AAOW
 						if (IsAte ())
 							{
 							// Удаление съеденного объекта
-							eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
-									RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
+							eatablePosition.X = RDGenerics.RND.Next (RoadLeft + eatable.FrameWidth / 2,
+								RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
 							eatablePosition.Y = -back.Height;
 
 							// Пересчёт очков
@@ -642,8 +702,8 @@ namespace RD_AAOW
 						soundDelay++;
 						soundDelay %= 100;
 						if (soundDelay == 0)
-							CBrake.Play ((90 + rnd.Next (10)) * 0.01f,
-								(10 - rnd.Next (20)) * 0.01f, 0.0f);
+							CBrake.Play ((90 + RDGenerics.RND.Next (10)) * 0.01f,
+								(10 - RDGenerics.RND.Next (20)) * 0.01f, 0.0f);
 						}
 					}
 
@@ -1082,26 +1142,26 @@ namespace RD_AAOW
 				// Для одной полосы скорость всех машин одинакова
 				for (int i = 0; i < carPosition.GetLength (0); i++)
 					{
-					b = rnd.Next (2);
+					b = RDGenerics.RND.Next (2);
 					s += b;
-					carPosition[i, j] = new CarState (rnd.Next (carTextures.Length), i, j, b);
+					carPosition[i, j] = new CarState (RDGenerics.RND.Next (carTextures.Length), i, j, b);
 					}
 
 				// Если (внезапно) все восемь машин окажутся активными
 				if (s == carPosition.GetLength (0))
-					carPosition[rnd.Next (carPosition.GetLength (0)), j].Enabled = 0;
+					carPosition[RDGenerics.RND.Next (carPosition.GetLength (0)), j].Enabled = 0;
 				}
 
 			// Первый съедобный объект
-			eatablePosition.X = rnd.Next (RoadLeft + eatable.FrameWidth / 2,
+			eatablePosition.X = RDGenerics.RND.Next (RoadLeft + eatable.FrameWidth / 2,
 				RoadLeft + RoadLineWidth * LinesQuantity - eatable.FrameWidth / 2);
 			eatablePosition.Y = -BackBufferHeight;
 
 			// Первый околодорожный объект
-			bytheTextureNumber = rnd.Next (bytheTextures.Length);
+			bytheTextureNumber = RDGenerics.RND.Next (bytheTextures.Length);
 			bythePosition.X = (3 * RoadLeft / 2 - bytheTextures[bytheTextureNumber].Width) / 2;
 			bythePosition.Y = -bytheTextures[bytheTextureNumber].Height;
-			bytheShow = rnd.Next (2);
+			bytheShow = RDGenerics.RND.Next (2);
 			}
 		}
 	}
