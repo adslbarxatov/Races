@@ -20,7 +20,6 @@ namespace RD_AAOW
 		private SpriteBatch spriteBatch;                    // Sprite-отрисовка
 		private KeyboardState keyboardState;                // Состояние клавиатуры
 		private SpriteFont defFont, midFont, bigFont;       // Шрифты
-		/*private Random rnd = new Random ();                 // ГСЧ*/
 
 		/// <summary>
 		/// Ширина окна
@@ -126,16 +125,10 @@ namespace RD_AAOW
 		// Пауза между звуками CBrake, CEng и прочими
 		private int soundDelay = 0;
 
-		// Звук и музыка в игре on/off
-		private bool isSound = true, isMusic = true;
-
 		// Параметры Alive и Working
 		private bool isAlive = false, isWorking = false;
 
 		// Очки
-
-		// Выигрыш
-		private int score = 0;
 
 		// Множитель для очков
 		private const int scoreMultiplier = 10;
@@ -247,13 +240,17 @@ namespace RD_AAOW
 			back = Content.Load<Texture2D> ("Background/Back");
 			startBack = Content.Load<Texture2D> ("Background/StartBack");
 
-			// ЧТЕНИЕ НАСТРОЕК И РЕЗУЛЬТАТОВ ИГРЫ
-			GameSettings (false);
+			// ПОДГРУЗКА НАСТРОЕК И РЕЗУЛЬТАТОВ ИГРЫ
+			levelNumber = (int)RacesSettings.LevelNumber - 10;
+			currentSpeed = levelNumber + 2;
 
 			// НАСТРОЙКА МУЗЫКИ
 			MediaPlayer.IsRepeating = true;
-			if (isMusic)
+			if (RacesSettings.MusicEnabled > 0)
+				{
+				MediaPlayer.Volume = RacesSettings.MusicVolume;
 				MediaPlayer.Play (Content.Load<Song> ("Sounds/Music2"));
+				}
 
 			// Инициализация
 			base.Initialize ();
@@ -347,7 +344,7 @@ namespace RD_AAOW
 									int s = 0;
 									for (int i = 0; i < carPosition.GetLength (0); i++)
 										{
-										score += carPosition[i, j].Enabled;
+										RacesSettings.GameScore += (uint)carPosition[i, j].Enabled;
 										carPosition[i, j].Enabled = RDGenerics.RND.Next (2);
 										s += carPosition[i, j].Enabled;
 										carPosition[i, j].TextureNumber = RDGenerics.RND.Next (carTextures.Length);
@@ -411,8 +408,8 @@ namespace RD_AAOW
 						// Следующий уровень
 						if (carsLeft >= levelNumber * scoreMultiplier / 2)
 							{
-							if (isSound)
-								NewLev.Play ();
+							if (RacesSettings.SoundsEnabled > 0)
+								NewLev.Play (RacesSettings.SoundVolume, 0, 0);
 
 							carsLeft = 0;
 							levelNumber++;
@@ -420,8 +417,8 @@ namespace RD_AAOW
 								LoadNextLevel ();
 							currentSpeed = levelNumber + 2;
 
-							// Запись настроек и результатов игры (в зависимости от того, есть они или нет)
-							GameSettings (true);
+							// Сохранение уровня
+							RacesSettings.LevelNumber = (uint)(levelNumber + 9);
 							}
 
 						// Проверка столкновений с машинами
@@ -429,11 +426,11 @@ namespace RD_AAOW
 							{
 							// Звук
 							MediaPlayer.Stop ();
-							if (isSound)
-								SFailed.Play ();
+							if (RacesSettings.SoundsEnabled > 0)
+								SFailed.Play (RacesSettings.SoundVolume, 0, 0);
 
-							// Запись настроек и результатов игры (в зависимости от того, есть они или нет)
-							GameSettings (true);
+							// Сохранение уровня
+							RacesSettings.LevelNumber = (uint)(levelNumber + 9);
 
 							// Переключение состояния игры
 							isAlive = isWorking = false;
@@ -445,7 +442,10 @@ namespace RD_AAOW
 							showLoseMsg = true;
 
 							// Пересчёт очков
-							score -= penalty;           // Размер штрафа
+							if (RacesSettings.GameScore >= penalty)
+								RacesSettings.GameScore -= penalty;
+							else
+								RacesSettings.GameScore = 0;
 
 							// Перезапуск уровня произойдёт по нажатию клавиши Space
 							}
@@ -459,11 +459,11 @@ namespace RD_AAOW
 							eatablePosition.Y = -back.Height;
 
 							// Пересчёт очков
-							score += 5 * scoreMultiplier;
+							RacesSettings.GameScore += 5 * scoreMultiplier;
 
 							// Звук
-							if (isSound)
-								SAte.Play ();
+							if (RacesSettings.SoundsEnabled > 0)
+								SAte.Play (RacesSettings.SoundVolume, 0, 0);
 							}
 						}
 
@@ -488,25 +488,27 @@ namespace RD_AAOW
 			// Настройки звука
 			if (!showExitMsg)
 				{
-				if (keyboardState.IsKeyDown (Keys.S))       // Sound on/off
+				// Sound on/off
+				if (keyboardState.IsKeyDown (Keys.S))
 					{
-					isSound = !isSound;
-					SOnOff.Play ();
+					RacesSettings.SoundsEnabled++;
+					SOnOff.Play (RacesSettings.SoundVolume, 0, 0);
 
 					// Была нажата клавиша
 					return true;
 					}
 
+				// Music on/off
 				if (keyboardState.IsKeyDown (Keys.M))
 					{
-					if (isMusic)                            // Music on/off
+					RacesSettings.MusicEnabled++;
+					if (RacesSettings.MusicEnabled == 0)
 						{
-						isMusic = false;
 						MediaPlayer.Stop ();
 						}
 					else
 						{
-						isMusic = true;
+						MediaPlayer.Volume = RacesSettings.MusicVolume;
 						MediaPlayer.Play (Content.Load<Song> ("Sounds/Music1"));
 						}
 					SOnOff.Play ();
@@ -573,21 +575,23 @@ namespace RD_AAOW
 					// Нажатие паузы и продолжения
 					if (!showExitMsg)           // Нельзя ничего делать, если появилось сообщение о выходе
 						{
-						if (isAlive && keyboardState.IsKeyDown (Keys.Space))    // Pause
+						if (isAlive && keyboardState.IsKeyDown (Keys.Space))
+						// Pause
 							{
 							if (isWorking)
 								{
 								isWorking = false;
 
-								if (isSound)
-									SStop.Play ();
+								if (RacesSettings.SoundsEnabled > 0)
+									SStop.Play (RacesSettings.SoundVolume, 0, 0);
 								}
-							else                                                // Continue
+							else
+							// Continue
 								{
 								isWorking = true;
 
-								if (isSound)
-									SStart.Play ();
+								if (RacesSettings.SoundsEnabled > 0)
+									SStart.Play (RacesSettings.SoundVolume, 0, 0);
 								}
 
 							return true;
@@ -611,8 +615,8 @@ namespace RD_AAOW
 							showExitMsg = true;
 
 							// Звук
-							if (isSound)
-								SStop.Play ();
+							if (RacesSettings.SoundsEnabled > 0)
+								SStop.Play (RacesSettings.SoundVolume, 0, 0);
 
 							return true;
 							}
@@ -697,12 +701,12 @@ namespace RD_AAOW
 							carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y - currentSpeed / 2);
 						}
 
-					if (isSound)
+					if (RacesSettings.SoundsEnabled > 0)
 						{
 						soundDelay++;
 						soundDelay %= 100;
 						if (soundDelay == 0)
-							CBrake.Play ((90 + RDGenerics.RND.Next (10)) * 0.01f,
+							CBrake.Play ((90 + RDGenerics.RND.Next (10)) * 0.01f * RacesSettings.SoundVolume,
 								(10 - RDGenerics.RND.Next (20)) * 0.01f, 0.0f);
 						}
 					}
@@ -721,12 +725,12 @@ namespace RD_AAOW
 							carPosition[i, j].SetCurrentPosY (carPosition[i, j].CurrentPosition.Y + currentSpeed);
 						}
 
-					if (isSound)
+					if (RacesSettings.SoundsEnabled > 0)
 						{
 						soundDelay++;
 						soundDelay %= 95;
 						if (soundDelay == 0)
-							CEng.Play ();
+							CEng.Play (RacesSettings.SoundVolume, 0, 0);
 						}
 					}
 				}
@@ -747,7 +751,7 @@ namespace RD_AAOW
 				}
 
 			string S1,
-				S2 = string.Format (stPoints, score),
+				S2 = string.Format (stPoints, RacesSettings.GameScore),
 				S3 = string.Format (stCarsLeft, levelNumber * scoreMultiplier / 2 - carsLeft);
 			if (isWorking)
 				S1 = string.Format (stLevel, levelNumber);
@@ -767,12 +771,12 @@ namespace RD_AAOW
 				DrawShadowedString (midFont, S3, V3, RacesGameColors.Green);
 
 			// Если есть музыка или звук, выводить соответствующий знак
-			if (isMusic)
+			if (RacesSettings.MusicEnabled > 0)
 				DrawShadowedString (defFont, "[\x266B]", V4, RacesGameColors.Yellow);
 			else
 				DrawShadowedString (defFont, "[\x266B]", V4, RacesGameColors.Black);
 
-			if (isSound)
+			if (RacesSettings.SoundsEnabled > 0)
 				DrawShadowedString (defFont, "[\x266A]", V5, RacesGameColors.Yellow);
 			else
 				DrawShadowedString (defFont, "[\x266A]", V5, RacesGameColors.Black);
@@ -854,7 +858,7 @@ namespace RD_AAOW
 				for (int i = 0; i < stSuccessLines.Length; i++)
 					stSuccessLines[i] = values[i];
 				}
-			string S01 = string.Format (stSuccessLines[1], score);
+			string S01 = string.Format (stSuccessLines[1], RacesSettings.GameScore);
 
 			Vector2 V1 = new Vector2 ((BackBufferWidth - bigFont.MeasureString (stSuccessLines[0]).X) / 2,
 						(BackBufferHeight - 400) / 2),
@@ -1020,8 +1024,11 @@ namespace RD_AAOW
 
 			// Запуск фоновой мелодии
 			MediaPlayer.Stop ();
-			if (isMusic)
+			if (RacesSettings.MusicEnabled > 0)
+				{
+				MediaPlayer.Volume = RacesSettings.MusicVolume;
 				MediaPlayer.Play (Content.Load<Song> ("Sounds/Music1"));
+				}
 
 			// Поиск следующего имеющегося уровня
 			while (true)
@@ -1035,8 +1042,11 @@ namespace RD_AAOW
 				levelNumber = -1;
 				isAlive = isWorking = false;
 				gameStatus = GameStatus.Finish;
-				if (isMusic)
+				if (RacesSettings.MusicEnabled > 0)
+					{
+					MediaPlayer.Volume = RacesSettings.MusicVolume;
 					MediaPlayer.Play (Content.Load<Song> ("Sounds/Music2"));
+					}
 				}
 
 			// ПЕРЕЗАГРУЗКА МАССИВОВ МАШИН И СЪЕДОБНЫХ ОБЪЕКТОВ
@@ -1098,36 +1108,6 @@ namespace RD_AAOW
 			spriteBatch.DrawString (VFont, VString, VPosition + new Vector2 (-1, 1), RacesGameColors.Black);
 			spriteBatch.DrawString (VFont, VString, VPosition + new Vector2 (-1, -1), RacesGameColors.Black);
 			spriteBatch.DrawString (VFont, VString, VPosition, VColor);
-			}
-
-		/// <summary>
-		/// Метод выполняет чтение / запись настроек игры
-		/// </summary>
-		/// <param name="Write">Флаг режима записи настроек</param>
-		private void GameSettings (bool Write)
-			{
-			// Если требуется запись
-			if (Write)
-				{
-				RDGenerics.SetAppSettingsValue ("Level", (levelNumber - 1).ToString ());
-				RDGenerics.SetAppSettingsValue ("Score", score.ToString ());
-				RDGenerics.SetAppSettingsValue ("Music", isMusic.ToString ());
-				RDGenerics.SetAppSettingsValue ("Sound", isSound.ToString ());
-				}
-
-			// Если требуется чтение, и файл при этом существует
-			else
-				{
-				try
-					{
-					levelNumber = int.Parse (RDGenerics.GetAppSettingsValue ("Level"));
-					currentSpeed = levelNumber + 2;
-					score = int.Parse (RDGenerics.GetAppSettingsValue ("Score"));
-					isMusic = bool.Parse (RDGenerics.GetAppSettingsValue ("Music"));
-					isSound = bool.Parse (RDGenerics.GetAppSettingsValue ("Sound"));
-					}
-				catch { }
-				}
 			}
 
 		/// <summary>
